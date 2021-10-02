@@ -17,7 +17,7 @@
     "url": "https://github.com/njaldea/onuw/issues"
   },
   "homepage": "https://github.com/njaldea/onuw#readme",
-  "devDependencies": {
+  "dependencies": {
     "dotenv": "^10.0.0",
     "find-config": "^1.0.0",
     "ws": "^8.2.2"

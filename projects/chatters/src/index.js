@@ -3,7 +3,7 @@ import { default as findconfig } from 'find-config';
 import { WebSocketServer } from 'ws';
 
 config({ path: findconfig('.env') });
-const wss = new WebSocketServer({ port: process.env.ONUW_CHATTERS_PORT });
+const wss = new WebSocketServer({ port: process.env.ONUW_CHATTERS_PORT || process.env.PORT });
 
 const chatters = {};
 
