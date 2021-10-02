@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "frontend:build": "cd projects/frontend && npm run build",
+    "frontend:build": "npm run build -w projects/frontend",
     "chatter:dev": "npm run dev -w projects/chatters",
     "frontend:dev": "npm run dev -w projects/frontend",
     "dev": "run-p frontend:dev chatter:dev"

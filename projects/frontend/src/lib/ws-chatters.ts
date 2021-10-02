@@ -3,7 +3,7 @@ const cbs = {};
 
 async function connect(url: string): Promise<void> {
     return new Promise((resolve, reject) => {
-        ws = new WebSocket(`ws://${url}`);
+        ws = new WebSocket(url);
         ws.onopen = e => {
             resolve();
         };
