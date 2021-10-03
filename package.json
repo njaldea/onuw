@@ -7,7 +7,8 @@
     "frontend:build": "npm run build -w projects/frontend",
     "chatter:dev": "npm run dev -w projects/chatters",
     "frontend:dev": "npm run dev -w projects/frontend",
-    "dev": "run-p frontend:dev chatter:dev"
+    "dev": "run-p frontend:dev chatter:dev",
+    "heroku:publish": "git subtree push --prefix projects/chatters heroku master"
   },
   "repository": {
     "type": "git",
