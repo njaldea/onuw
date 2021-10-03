@@ -13,6 +13,12 @@ function sendChatters() {
     }
 }
 
+function sendMessage(name, message) {
+    for (const key in chatters) {
+        chatters[key].send(JSON.stringify({ type: 2, name, message }));
+    }
+}
+
 wss.on('connection', ws => {
     ws.on('message', message => {
         console.log('received: %s', message);
@@ -27,6 +33,8 @@ wss.on('connection', ws => {
                 delete chatters[m.chatter];
                 sendChatters();
             }
+        } else if (m.type === 4) {
+            sendMessage(m.name, m.message);
         }
     });
     ws.on('close', function close() {
