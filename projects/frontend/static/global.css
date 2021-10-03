@@ -1,10 +1,20 @@
-
-*, *::before, *::after {
-    box-sizing: border-box;
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
 }
 
-html, body, #svelte {
-    width: 100%;
-    height: 100%;
-    background-color: hsl(0, 100%, 100%);
+:root {
+	--color: hsl(0, 100%, 100%);
+	--background-color: hsl(0, 0%, 10%);
+}
+
+html,
+body,
+#svelte {
+	width: 100%;
+	height: 100%;
+	background-color: var(--background-color);
 }

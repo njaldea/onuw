@@ -4,10 +4,13 @@
     import wschatter from '$lib/ws-chatters';
 
     let loaded = false;
-    onMount(async () => {
-        await wschatter.connect(CHATTERS_URL);
-        loaded = true;
-    });
+    function connect()
+    {
+        wschatter.connect(CHATTERS_URL)
+            .then(() => loaded = true)
+            .catch(() => setTimeout(connect, 1000));
+    }
+    onMount(connect);
 </script>
 
 {#if loaded}
@@ -20,19 +23,26 @@
 
 <style>
     div > div {
-        width: 50%;
-        height: 50%;
-        background-color: red;
+        width: 75%;
+        min-width: 500px;
+        max-width: 800px;
+
+        margin: auto;
+        margin-top: 20px;
+        padding: 10px;
         display: flex;
         flex-direction: column;
-        padding: 10px;
+
         gap: 10px;
+
+        box-shadow: 0 0 20px 10px;
     }
 
     .root {
         width: 100%;
         height: 100%;
         display: grid;
-        place-items: center;
+        color: var(--color);
+        background-color: var(--background-color);
     }
 </style>
