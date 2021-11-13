@@ -1,6 +1,6 @@
 <script lang='ts'>
     import Cell from '$components/chess/Cell.svelte';
-    import { getTileColor } from '$lib/chess';
+    import { getTileColor, resetCoveredBy } from '$lib/chess';
     import type { CellDetail } from '$lib/types/Chess';
 
     export let cells: CellDetail[];
@@ -16,6 +16,7 @@
         {
             const piece = fromcell.piece;
             tocell.piece = piece;
+            tocell.piece.hasMoved = true;
             fromcell.piece = null;
         }
 
@@ -24,6 +25,7 @@
             cell.targeted = false;
         }
 
+        resetCoveredBy(cells);
         cells = cells;
     }
 
@@ -39,15 +41,42 @@
 
     function dragpiecestart({ detail: { ref } }: { detail: { ref: [number, number] } })
     {
+        console.log("dragging", ref[0], ref[1]);
         const cell = cells[(ref[0] * dimension[0]) + ref[1]];
-        console.log('dragpiecestart', cell);
         if (cell.piece)
         {
-            const possiblemoves = cell.piece.getPossibleMoves(ref[0], ref[1]);
-            console.log(possiblemoves)
-            for (const p of possiblemoves)
+            if (cell.piece && cell.piece.role === "K")
             {
-                cells[(p[0] * dimension[0]) + p[1]].targeted = true;
+                const possiblemoves = cell.piece.getPossibleMoves(ref[0], ref[1]);
+                for (const p of possiblemoves)
+                {
+                    const possibletargetcell = cells[(p[0] * dimension[0]) + p[1]];
+                    console.log("possiblemoves", JSON.stringify(p), possibletargetcell)
+                    let exclude = false;
+                    for (const support of possibletargetcell.coveredby)
+                    {
+                        const supportingPiece = cells[(support[0] * dimension[0]) + support[1]].piece;
+                        console.log("support", support, supportingPiece);
+                        console.log("cell", cell.piece.team, supportingPiece.team)
+                        if (supportingPiece.team != cell.piece.team)
+                        {
+                            exclude = true;
+                            break;
+                        }
+                    }
+                    if (exclude === false)
+                    {
+                        cells[(p[0] * dimension[0]) + p[1]].targeted = true;
+                    }
+                }
+            }
+            else
+            {
+                const possiblemoves = cell.piece.getPossibleMoves(ref[0], ref[1]);
+                for (const p of possiblemoves)
+                {
+                    cells[(p[0] * dimension[0]) + p[1]].targeted = true;
+                }
             }
             cells = cells;
         }
@@ -58,7 +87,8 @@
         const ret: CellDetail[][] = [];
         for (let x = 0; x < items.length; x += ccount)
         {
-            ret.push(items.slice(x, x + ccount));
+            const row = items.slice(x, x + ccount);
+            ret.push(flipped ? row : row.reverse());
         }
 
         return flipped ? ret : ret.reverse();
@@ -69,10 +99,11 @@
     {#each split(cells, dimension[1]) as row, rindex}
         {#each row as cell, cindex (cell.id)}
             <Cell
-                color={getTileColor(rindex, cindex, flipped)}
+                color={getTileColor(rindex, cindex)}
                 piece={cell.piece}
                 position={cell.position}
                 targetable={cell.targeted}
+                coveredby={cell.coveredby}
                 on:dragconfirm={dragconfirm}
                 on:dragcancel={dragcancel}
                 on:piecedragstart={dragpiecestart}

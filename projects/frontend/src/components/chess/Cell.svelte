@@ -5,6 +5,7 @@
     export let piece: null|Piece;
     export let position: [number, number];
     export let targetable: boolean = true;
+    export let coveredby: [number, number][];
 
     import action from '$lib/actions/draggable';
 
@@ -60,6 +61,7 @@
     }
 
     .boundedpiece {
+        color: red;
         position: absolute;
     }
 
