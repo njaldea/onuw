@@ -23,15 +23,14 @@
 
 <style>
     div > div {
-        width: 75%;
-        min-width: 500px;
-        max-width: 800px;
+        width: 85%;
 
         margin: auto;
         margin-top: 20px;
         padding: 10px;
         display: flex;
         flex-direction: column;
+        align-items: center;
 
         gap: 10px;
 

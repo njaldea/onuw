@@ -11,3 +11,13 @@
 
 <input type='text' bind:value={name}>
 <button on:click={next}>Next</button>
+
+
+<style>
+    input {
+        width: 100%;
+    }
+    button {
+        width: 100%;
+    }
+</style>

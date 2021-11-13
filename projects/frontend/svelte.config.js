@@ -13,7 +13,8 @@ const config = {
 		vite: {
 			resolve: {
 				alias: {
-					$stores: resolve('./src/stores')
+					$stores: resolve('./src/stores'),
+					$components: resolve('./src/components')
 				}
 			},
 			envPrefix: 'ONUW_'
