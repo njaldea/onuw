@@ -7,7 +7,7 @@
     export let dimension: [number, number];
     export let flipped: boolean;
 
-    function movepiece({ detail: { from, to } })
+    function dragconfirm({ detail: { from, to } })
     {
         const fromcell = cells[(from[0] * dimension[0]) + from[1]];
         const tocell = cells[(to[0] * dimension[0]) + to[1]];
@@ -19,6 +19,16 @@
             fromcell.piece = null;
         }
 
+        for (const cell of cells)
+        {
+            cell.targeted = false;
+        }
+
+        cells = cells;
+    }
+
+    function dragcancel()
+    {
         for (const cell of cells)
         {
             cell.targeted = false;
@@ -63,7 +73,8 @@
                 piece={cell.piece}
                 position={cell.position}
                 targetable={cell.targeted}
-                on:movepiece={movepiece}
+                on:dragconfirm={dragconfirm}
+                on:dragcancel={dragcancel}
                 on:piecedragstart={dragpiecestart}
             />
         {/each}

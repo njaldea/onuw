@@ -19,19 +19,21 @@
     {
         const matches = candidates.filter(c => c !== origin.parentElement && c.classList.contains("cell"));
         if (matches.length > 0) {
-            matches[0].dispatchEvent(new CustomEvent("celldrop", {detail: { from: position }}));
+            matches[0].dispatchEvent(new CustomEvent("dragconfirm", {detail: { from: position }}));
+        } else {
+            dispatch("dragcancel");
         }
     }
 
     const { draggable } = action(start, end);
 
-    function celldrop(ev: CustomEvent)
+    function dragconfirm(ev: CustomEvent)
     {
-        dispatch("movepiece", { from: ev.detail.from, to: position });
+        dispatch("dragconfirm", { from: ev.detail.from, to: position });
     }
 </script>
 
-<div class:targetable class="cell" style={`--cellcolor: ${color}`} on:celldrop={celldrop}>
+<div class:targetable class="cell" style={`--cellcolor: ${color}`} on:dragconfirm={dragconfirm}>
     {#if piece !== null}
         <div class="boundedpiece" use:draggable={{ piece: piece }}>
             <div class="piece" class:team={piece.team}>{piece.role}</div>
