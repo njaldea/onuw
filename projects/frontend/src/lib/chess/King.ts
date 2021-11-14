@@ -1,12 +1,12 @@
 
 import { Piece } from "../types/Chess";
-import type { PieceGetter } from "../types/Chess";
+import type { PieceGetter, CellBoundCheck } from "../types/Chess";
 
 export default class King extends Piece
 {
-    constructor(team: boolean, pieceGetter: PieceGetter)
+    constructor(team: boolean, isCellInBound: CellBoundCheck, pieceGetter: PieceGetter)
     {
-        super("K", team, pieceGetter);
+        super("K", team, isCellInBound, pieceGetter);
     }
 
     getPossibleMoves(r: number, f: number): [number, number][]
@@ -48,7 +48,7 @@ export default class King extends Piece
         const retval: [number, number][] = [];
         const rank = r + rinc;
         const file = f + finc;
-        if (0 <= rank && rank <= 7 && 0 <= file && file <= 7)
+        if (this.isCellInBound(rank, file))
         {
             const piece = this.pieceGetter(rank, file);
             if (piece == null)

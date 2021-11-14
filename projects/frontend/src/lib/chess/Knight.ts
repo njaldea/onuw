@@ -1,12 +1,12 @@
 
 import { Piece } from "../types/Chess";
-import type { PieceGetter } from "../types/Chess";
+import type { PieceGetter, CellBoundCheck } from "../types/Chess";
 
 export default class Knight extends Piece
 {
-    constructor(team: boolean, pieceGetter: PieceGetter)
+    constructor(team: boolean, isCellInBound: CellBoundCheck, pieceGetter: PieceGetter)
     {
-        super("N", team, pieceGetter);
+        super("N", team, isCellInBound, pieceGetter);
     }
 
     getPossibleMoves(r: number, f: number): [number, number][]
@@ -23,8 +23,7 @@ export default class Knight extends Piece
     {
         const isvalid = (p: [number, number]): boolean =>
         {
-            const inboard = p[0] >= 0 && p[0] <= 7 && p[1] >= 0 && p[1] <= 7;
-            if (inboard)
+            if (this.isCellInBound(p[0], p[1]))
             {
                 if (supporting)
                 {

@@ -1,12 +1,12 @@
 
 import { Piece } from "../types/Chess";
-import type { PieceGetter } from "../types/Chess";
+import type { PieceGetter, CellBoundCheck } from "../types/Chess";
 
 export default class Rook extends Piece
 {
-    constructor(team: boolean, pieceGetter: PieceGetter)
+    constructor(team: boolean, isCellInBound: CellBoundCheck, pieceGetter: PieceGetter)
     {
-        super("R", team, pieceGetter);
+        super("R", team, isCellInBound, pieceGetter);
     }
 
     getPossibleMoves(r: number, f: number): [number, number][]
@@ -32,11 +32,11 @@ export default class Rook extends Piece
     moves(r: number, f: number, rinc: number, finc: number, supporting: boolean): [number, number][]
     {
         const retval: [number, number][] = [];
-        for (let i = 0; i < 8; ++i)
+        for (let i = 0; true; ++i)
         {
             const rank = r + (rinc * (i + 1));
             const file = f + (finc * (i + 1));
-            if (0 <= rank && rank <= 7 && 0 <= file && file <= 7)
+            if (this.isCellInBound(rank, file))
             {
                 const piece = this.pieceGetter(rank, file);
                 if (piece != null && piece.team === this.team)
