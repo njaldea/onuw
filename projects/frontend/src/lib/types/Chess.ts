@@ -33,5 +33,5 @@ export class Cell {
 	piece: null | Piece;
 	targeted: boolean;
 	position: [number, number];
-	coveredby: [number, number][];
+	coveredby: number[];
 }

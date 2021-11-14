@@ -4,16 +4,16 @@ import type { PieceGetter, CellBoundCheck } from '../types/Chess';
 type MoveTransformer = (r: number, f: number, rdelta: number, fdelta: number) => [number, number];
 
 export default class Pawn extends Piece {
-    transform: MoveTransformer;
+	transform: MoveTransformer;
 
 	constructor(
-        team: boolean,
-        isCellInBound: CellBoundCheck,
-        pieceGetter: PieceGetter,
-        moveTransformer: MoveTransformer)
-    {
+		team: boolean,
+		isCellInBound: CellBoundCheck,
+		pieceGetter: PieceGetter,
+		moveTransformer: MoveTransformer
+	) {
 		super('P', team, isCellInBound, pieceGetter);
-        this.transform = moveTransformer;
+		this.transform = moveTransformer;
 	}
 
 	getPossibleMoves(r: number, f: number): [number, number][] {
@@ -26,7 +26,7 @@ export default class Pawn extends Piece {
 			}
 
 			if (this.hasMoved === false && retval.length === 1) {
-                const nextNextCell = this.transform(r, f, 2, 0);
+				const nextNextCell = this.transform(r, f, 2, 0);
 				if (
 					this.isCellInBound(nextNextCell[0], nextNextCell[1]) &&
 					this.pieceGetter(nextNextCell[0], nextNextCell[1]) == null
