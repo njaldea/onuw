@@ -1,18 +1,21 @@
 import type { Piece } from '$lib/types/Chess';
 import { spring } from 'svelte/motion';
 
-export default function create(onstart, onend) {
+type Action = { destroy: () => void };
+
+export default function (
+	onstart: () => void,
+	onend: (origin: HTMLDivElement, candidates: Element[]) => void
+): () => Action {
 	let offsetX = 0;
 	let offsetY = 0;
 
 	const opts = { stiffness: 0.2, damping: 0.4 };
 	const offset = spring({ x: 0, y: 0 }, opts);
 
-	function action(div: HTMLDivElement, { piece }: { piece: Piece }) {
+	function action(div: HTMLDivElement, { piece }: { piece: Piece }): Action {
 		let lastX: number;
 		let lastY: number;
-
-		let dropTarget: HTMLDivElement;
 
 		const motionUnsub = offset.subscribe((offset) => {
 			div.style.transform = `translate(${offset.x}px, ${offset.y}px)`;
@@ -42,12 +45,10 @@ export default function create(onstart, onend) {
 			lastX = ev.clientX;
 			lastY = ev.clientY;
 
-			dropTarget = div;
-
 			onstart();
 		}
 
-		function end(ev: MouseEvent) {
+		function end() {
 			if (piece === null) return;
 			if (track === false) return;
 			track = false;
@@ -72,12 +73,9 @@ export default function create(onstart, onend) {
 				window.removeEventListener('mousemove', move);
 				div.removeEventListener('mousedown', start);
 				div.removeEventListener('mouseup', end);
-			},
-			update: () => {}
+			}
 		};
 	}
 
-	return {
-		draggable: action
-	};
+	return action;
 }

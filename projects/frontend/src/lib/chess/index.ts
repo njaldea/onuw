@@ -37,7 +37,7 @@ function createPiece(
 	return null;
 }
 
-export function resetCoveredBy(cells: Cell[]) {
+export function resetCoveredBy(cells: Cell[]): void {
 	cells.forEach((cell) => (cell.coveredby = []));
 	for (let r = 0; r < 8; ++r) {
 		for (let c = 0; c < 8; ++c) {
@@ -52,7 +52,7 @@ export function resetCoveredBy(cells: Cell[]) {
 	}
 }
 
-export function getCells() {
+export function getCells(): { dimension: [number, number]; cells: Cell[] } {
 	const cells: Cell[] = [];
 
 	const rcount = 8;
@@ -78,7 +78,7 @@ export function getCells() {
 	return { dimension: [8, 8], cells };
 }
 
-export function getTileColor(r: number, c: number) {
+export function getTileColor(r: number, c: number): string {
 	type Callable = () => string;
 	const get = (i: number, p: Callable, s: Callable) => (i % 2 === 0 ? p() : s());
 	const cb1 = () =>

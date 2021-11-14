@@ -14,7 +14,7 @@ export default class Knight extends Piece {
 		return this.moves(r, f, true);
 	}
 
-	moves(r: number, f: number, supporting: boolean) {
+	moves(r: number, f: number, supporting: boolean): [number, number][] {
 		const isvalid = (p: [number, number]): boolean => {
 			if (this.isCellInBound(p[0], p[1])) {
 				if (supporting) {

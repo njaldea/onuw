@@ -4,7 +4,7 @@
     export let color: string;
     export let piece: null|Piece;
     export let position: [number, number];
-    export let targetable: boolean = true;
+    export let targetable = true;
 
     import action from '$lib/actions/draggable';
 
@@ -15,7 +15,7 @@
         dispatch("piecedragstart", { ref: position });
     }
 
-    function end(origin: HTMLDivElement, candidates: HTMLElement[])
+    function end(origin: HTMLDivElement, candidates: Element[])
     {
         const matches = candidates.filter(c => c !== origin.parentElement && c.classList.contains("cell"));
         if (matches.length > 0) {
@@ -25,7 +25,7 @@
         }
     }
 
-    const { draggable } = action(start, end);
+    const draggable = action(start, end);
 
     function dragconfirm(ev: CustomEvent)
     {

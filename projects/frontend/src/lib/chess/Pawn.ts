@@ -50,7 +50,7 @@ export default class Pawn extends Piece {
 		out: [number, number][],
 		[rank, file]: [number, number],
 		predicate: (p: [number, number]) => boolean
-	) {
+	): void {
 		if (this.isCellInBound(rank, file)) {
 			if (predicate([rank, file])) {
 				out.push([rank, file]);
