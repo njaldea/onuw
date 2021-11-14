@@ -1,16 +1,18 @@
 <script lang='ts'>
     import CellComponent from '$components/chess/Cell.svelte';
-    import { getTileColor, resetCoveredBy } from '$lib/chess';
+    import { resetCoveredBy } from '$lib/chess';
+    import type { Kingdom } from '$lib/chess';
     import type { Cell } from '$lib/types/Chess';
 
     export let cells: Cell[];
+    export let teams: Kingdom[];
     export let dimension: [number, number];
     export let flipped: boolean;
 
     function dragconfirm({ detail: { from, to } })
     {
-        const fromcell = cells[(from[0] * dimension[0]) + from[1]];
-        const tocell = cells[(to[0] * dimension[0]) + to[1]];
+        const fromcell = cells[from];
+        const tocell = cells[to];
 
         if (tocell.targeted)
         {
@@ -39,9 +41,9 @@
         cells = cells;
     }
 
-    function removeInvalidMoves(cell: Cell, rank: number, file: number)
+    function removeInvalidMoves(cell: Cell)
     {
-        const possiblemoves = cell.piece.getPossibleMoves(rank, file);
+        const possiblemoves = cell.piece.getPossibleMoves(...cell.position);
         for (const p of possiblemoves)
         {
             const possibletargetcell = cells[(p[0] * dimension[0]) + p[1]];
@@ -62,18 +64,18 @@
         }
     }
 
-    function dragpiecestart({ detail: { ref: [rank, file] } }: { detail: { ref: [number, number] } })
+    function dragpiecestart({ detail: { id } }: { detail: { id: number } })
     {
-        const cell = cells[(rank * dimension[0]) + file];
+        const cell = cells[id];
         if (cell.piece)
         {
-            if (cell.piece && cell.piece.role === "K")
+            if (cell.piece && teams.find(t => t.king === cell.piece))
             {
-                removeInvalidMoves(cell, rank, file);
+                removeInvalidMoves(cell);
             }
             else
             {
-                for (const p of cell.piece.getPossibleMoves(rank, file))
+                for (const p of cell.piece.getPossibleMoves(...cell.position))
                 {
                     cells[(p[0] * dimension[0]) + p[1]].targeted = true;
                 }
@@ -81,33 +83,20 @@
             cells = cells;
         }
     }
-
-    function split(items: Cell[], ccount: number)
-    {
-        const ret: Cell[][] = [];
-        for (let x = 0; x < items.length; x += ccount)
-        {
-            const row = items.slice(x, x + ccount);
-            ret.push(flipped ? row : row.reverse());
-        }
-
-        return flipped ? ret : ret.reverse();
-    }
 </script>
 
 <div class='board'style={`--rcount: ${dimension[0]}; --ccount: ${dimension[1]};`}>
-    {#each split(cells, dimension[1]) as row, rindex}
-        {#each row as cell, cindex (cell.id)}
-            <CellComponent
-                color={getTileColor(rindex, cindex)}
-                piece={cell.piece}
-                position={cell.position}
-                targetable={cell.targeted}
-                on:dragconfirm={dragconfirm}
-                on:dragcancel={dragcancel}
-                on:piecedragstart={dragpiecestart}
-            />
-        {/each}
+    {#each flipped ? cells : cells.slice().reverse() as cell (cell.id)}
+        <CellComponent
+            id={cell.id}
+            alt={Math.floor(cell.id / dimension[0]) % 2 ^ cell.id % 2}
+            piece={cell.piece}
+            position={cell.position}
+            targeted={cell.targeted}
+            on:dragconfirm={dragconfirm}
+            on:dragcancel={dragcancel}
+            on:piecedragstart={dragpiecestart}
+        />
     {/each}
 </div>
 

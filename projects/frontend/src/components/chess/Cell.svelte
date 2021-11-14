@@ -1,10 +1,10 @@
 <script lang='ts'>
     import { createEventDispatcher } from 'svelte';
     import type { Piece } from '$lib/types/Chess';
-    export let color: string;
+    export let id: number;
+    export let alt: boolean;
     export let piece: null|Piece;
-    export let position: [number, number];
-    export let targetable = true;
+    export let targeted = true;
 
     import action from '$lib/actions/draggable';
 
@@ -12,14 +12,14 @@
 
     function start()
     {
-        dispatch("piecedragstart", { ref: position });
+        dispatch("piecedragstart", { id });
     }
 
     function end(origin: HTMLDivElement, candidates: Element[])
     {
         const matches = candidates.filter(c => c !== origin.parentElement && c.classList.contains("cell"));
         if (matches.length > 0) {
-            matches[0].dispatchEvent(new CustomEvent("dragconfirm", {detail: { from: position }}));
+            matches[0].dispatchEvent(new CustomEvent("dragconfirm", { detail: { from: id } }));
         } else {
             dispatch("dragcancel");
         }
@@ -29,11 +29,11 @@
 
     function dragconfirm(ev: CustomEvent)
     {
-        dispatch("dragconfirm", { from: ev.detail.from, to: position });
+        dispatch("dragconfirm", { from: ev.detail.from, to: id });
     }
 </script>
 
-<div class:targetable class="cell" style={`--cellcolor: ${color}`} on:dragconfirm={dragconfirm}>
+<div class:targeted class="cell" class:alt on:dragconfirm={dragconfirm}>
     {#if piece !== null}
         <div class="boundedpiece" use:draggable={{ piece: piece }}>
             <div class="piece" class:team={piece.team}>{piece.role}</div>
@@ -52,10 +52,14 @@
 
     .cell {
         position: relative;
-        background: var(--cellcolor);
+        background: white;
     }
 
-    .cell.targetable {
+    .cell.alt {
+        background: black;
+    }
+
+    .cell.targeted {
         background: lightskyblue;
     }
 

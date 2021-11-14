@@ -8,33 +8,55 @@ import Bishop from './Bishop';
 import Queen from './Queen';
 import King from './King';
 
-function createPiece(
-	rank: number,
-	file: number,
-	isCellInBound: CellBoundCheck,
-	pieceGetter: PieceGetter
-): null | Piece {
-	if (rank === 0 || rank === 7) {
-		if (file === 0 || file === 7) {
-			return new Rook(rank === 0, isCellInBound, pieceGetter);
-		}
-		if (file === 1 || file === 6) {
-			return new Knight(rank === 0, isCellInBound, pieceGetter);
-		}
-		if (file === 2 || file === 5) {
-			return new Bishop(rank === 0, isCellInBound, pieceGetter);
-		}
-		if (file === 4) {
-			return new Queen(rank === 0, isCellInBound, pieceGetter);
-		}
-		if (file === 3) {
-			return new King(rank === 0, isCellInBound, pieceGetter);
-		}
-	}
-	if (rank === 1 || rank === 6) {
-		return new Pawn(rank === 1, isCellInBound, pieceGetter);
-	}
-	return null;
+// 8x8
+export class Kingdom
+{
+    king: Piece;
+    queen: Piece;
+    bishops: Piece[];
+    knights: Piece[];
+    rooks: Piece[];
+    pawns: Piece[];
+    graveyard: Piece[];
+
+    constructor(
+        team: boolean,
+        isCellInBound: CellBoundCheck,
+        pieceGetter: PieceGetter
+    )
+    {
+        this.king = new King(team, isCellInBound, pieceGetter);
+        this.queen = new Queen(team, isCellInBound, pieceGetter);
+        this.bishops = [
+            new Bishop(team, isCellInBound, pieceGetter),
+            new Bishop(team, isCellInBound, pieceGetter)
+        ];
+        this.knights = [
+            new Knight(team, isCellInBound, pieceGetter),
+            new Knight(team, isCellInBound, pieceGetter)
+        ];
+        this.rooks = [
+            new Rook(team, isCellInBound, pieceGetter),
+            new Rook(team, isCellInBound, pieceGetter)
+        ];
+
+        // assumes white always at rank 0
+        const transform = team ? 
+            (r: number, f: number, rdelta: number, fdelta: number): [number, number] => [ r + rdelta, f + fdelta ] :
+            (r: number, f: number, rdelta: number, fdelta: number): [number, number] => [ r - rdelta, f - fdelta ];
+
+
+        this.pawns = [
+            new Pawn(team, isCellInBound, pieceGetter, transform),
+            new Pawn(team, isCellInBound, pieceGetter, transform),
+            new Pawn(team, isCellInBound, pieceGetter, transform),
+            new Pawn(team, isCellInBound, pieceGetter, transform),
+            new Pawn(team, isCellInBound, pieceGetter, transform),
+            new Pawn(team, isCellInBound, pieceGetter, transform),
+            new Pawn(team, isCellInBound, pieceGetter, transform),
+            new Pawn(team, isCellInBound, pieceGetter, transform)
+        ];
+    }
 }
 
 export function resetCoveredBy(cells: Cell[]): void {
@@ -52,7 +74,12 @@ export function resetCoveredBy(cells: Cell[]): void {
 	}
 }
 
-export function getCells(): { dimension: [number, number]; cells: Cell[] } {
+export function getCells(): {
+    dimension: [number, number],
+    cells: Cell[],
+    teams: [Kingdom, Kingdom]
+}
+{
 	const cells: Cell[] = [];
 
 	const rcount = 8;
@@ -67,31 +94,52 @@ export function getCells(): { dimension: [number, number]; cells: Cell[] } {
 
 	const isCellInBound: CellBoundCheck = (r: number, f: number) => {
 		return 0 <= r && r < rcount && 0 <= f && f < ccount;
-	};
+	}
 
+    const kingdom1 = new Kingdom(true, isCellInBound, pieceGetter);
+    const kingdom2 = new Kingdom(false, isCellInBound, pieceGetter);
 	for (let r = 0; r < rcount; ++r) {
 		for (let c = 0; c < ccount; ++c) {
-			cells.push(new Cell(r * rcount + c, createPiece(r, c, isCellInBound, pieceGetter), [r, c]));
+			cells.push(new Cell(r * rcount + c, [r, c]));
 		}
 	}
-	resetCoveredBy(cells);
-	return { dimension: [8, 8], cells };
-}
 
-export function getTileColor(r: number, c: number): string {
-	type Callable = () => string;
-	const get = (i: number, p: Callable, s: Callable) => (i % 2 === 0 ? p() : s());
-	const cb1 = () =>
-		get(
-			c,
-			() => 'white',
-			() => 'black'
-		);
-	const cb2 = () =>
-		get(
-			c,
-			() => 'black',
-			() => 'white'
-		);
-	return get(r, cb1, cb2);
+    cells[0].piece = kingdom1.rooks[0];
+    cells[1].piece = kingdom1.knights[0];
+    cells[2].piece = kingdom1.bishops[0];
+    cells[3].piece = kingdom1.king;
+    cells[4].piece = kingdom1.queen;
+    cells[5].piece = kingdom1.bishops[1];
+    cells[6].piece = kingdom1.knights[1];
+    cells[7].piece = kingdom1.rooks[1];
+
+    cells[8 + 0].piece = kingdom1.pawns[0];
+    cells[8 + 1].piece = kingdom1.pawns[1];
+    cells[8 + 2].piece = kingdom1.pawns[2];
+    cells[8 + 3].piece = kingdom1.pawns[3];
+    cells[8 + 4].piece = kingdom1.pawns[4];
+    cells[8 + 5].piece = kingdom1.pawns[5];
+    cells[8 + 6].piece = kingdom1.pawns[6];
+    cells[8 + 7].piece = kingdom1.pawns[7];
+
+    cells[63 - 0].piece = kingdom2.rooks[0];
+    cells[63 - 1].piece = kingdom2.knights[0];
+    cells[63 - 2].piece = kingdom2.bishops[0];
+    cells[63 - 3].piece = kingdom2.queen;
+    cells[63 - 4].piece = kingdom2.king;
+    cells[63 - 5].piece = kingdom2.bishops[1];
+    cells[63 - 6].piece = kingdom2.knights[1];
+    cells[63 - 7].piece = kingdom2.rooks[1];
+
+    cells[55 - 0].piece = kingdom2.pawns[0];
+    cells[55 - 1].piece = kingdom2.pawns[1];
+    cells[55 - 2].piece = kingdom2.pawns[2];
+    cells[55 - 3].piece = kingdom2.pawns[3];
+    cells[55 - 4].piece = kingdom2.pawns[4];
+    cells[55 - 5].piece = kingdom2.pawns[5];
+    cells[55 - 6].piece = kingdom2.pawns[6];
+    cells[55 - 7].piece = kingdom2.pawns[7];
+
+	resetCoveredBy(cells);
+	return { dimension: [8, 8], cells, teams: [kingdom1, kingdom2] };
 }

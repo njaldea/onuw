@@ -6,7 +6,7 @@ type Action = { destroy: () => void };
 export default function (
 	onstart: () => void,
 	onend: (origin: HTMLDivElement, candidates: Element[]) => void
-): () => Action {
+): (div: HTMLDivElement, { piece }: { piece: Piece }) => Action {
 	let offsetX = 0;
 	let offsetY = 0;
 

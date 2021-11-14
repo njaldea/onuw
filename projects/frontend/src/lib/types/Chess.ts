@@ -21,9 +21,9 @@ export abstract class Piece {
 }
 
 export class Cell {
-	constructor(i: number, p: null | Piece, pos: [number, number]) {
+	constructor(i: number, pos: [number, number]) {
 		this.id = i;
-		this.piece = p;
+		this.piece = null;
 		this.targeted = false;
 		this.position = pos;
 		this.coveredby = [];
