@@ -103,12 +103,12 @@ export function getCells(): {
 	}
 
 	cells[0].piece = kingdom1.rooks[0];
-	// cells[1].piece = kingdom1.knights[0];
-	// cells[2].piece = kingdom1.bishops[0];
+	cells[1].piece = kingdom1.knights[0];
+	cells[2].piece = kingdom1.bishops[0];
 	cells[3].piece = kingdom1.king;
-	// cells[4].piece = kingdom1.queen;
-	// cells[5].piece = kingdom1.bishops[1];
-	// cells[6].piece = kingdom1.knights[1];
+	cells[4].piece = kingdom1.queen;
+	cells[5].piece = kingdom1.bishops[1];
+	cells[6].piece = kingdom1.knights[1];
 	cells[7].piece = kingdom1.rooks[1];
 
 	cells[8 + 0].piece = kingdom1.pawns[0];
@@ -121,12 +121,12 @@ export function getCells(): {
 	cells[8 + 7].piece = kingdom1.pawns[7];
 
 	cells[63 - 0].piece = kingdom2.rooks[0];
-	// cells[63 - 1].piece = kingdom2.knights[0];
-	// cells[63 - 2].piece = kingdom2.bishops[0];
-	// cells[63 - 3].piece = kingdom2.queen;
+	cells[63 - 1].piece = kingdom2.knights[0];
+	cells[63 - 2].piece = kingdom2.bishops[0];
+	cells[63 - 3].piece = kingdom2.queen;
 	cells[63 - 4].piece = kingdom2.king;
-	// cells[63 - 5].piece = kingdom2.bishops[1];
-	// cells[63 - 6].piece = kingdom2.knights[1];
+	cells[63 - 5].piece = kingdom2.bishops[1];
+	cells[63 - 6].piece = kingdom2.knights[1];
 	cells[63 - 7].piece = kingdom2.rooks[1];
 
 	cells[55 - 0].piece = kingdom2.pawns[0];
