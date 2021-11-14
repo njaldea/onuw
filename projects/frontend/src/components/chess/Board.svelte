@@ -9,6 +9,8 @@
     export let dimension: [number, number];
     export let flipped: boolean;
 
+    let teamToMove = true;
+
     function dragconfirm({ detail: { from, to } })
     {
         const fromcell = cells[from];
@@ -29,6 +31,7 @@
 
         resetCoveredBy(cells);
         cells = cells;
+        teamToMove = !teamToMove;
     }
 
     function dragcancel()
@@ -67,7 +70,7 @@
     function dragpiecestart({ detail: { id } }: { detail: { id: number } })
     {
         const cell = cells[id];
-        if (cell.piece)
+        if (cell.piece && teamToMove === cell.piece.team)
         {
             if (cell.piece && teams.find(t => t.king === cell.piece))
             {
