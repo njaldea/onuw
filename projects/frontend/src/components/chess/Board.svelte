@@ -14,24 +14,28 @@
     function dragconfirm({ detail: { from, to } })
     {
         const fromcell = cells[from];
-        const tocell = cells[to];
 
-        if (tocell.targeted)
+        if (teamToMove === fromcell.piece.team)
         {
-            const piece = fromcell.piece;
-            tocell.piece = piece;
-            tocell.piece.hasMoved = true;
-            fromcell.piece = null;
-        }
+            const tocell = cells[to];
+            if (tocell.targeted)
+            {
+                const piece = fromcell.piece;
+                tocell.piece = piece;
+                tocell.piece.hasMoved = true;
+                fromcell.piece = null;
+            }
+            
+            for (const cell of cells)
+            {
+                cell.targeted = false;
+            }
 
-        for (const cell of cells)
-        {
-            cell.targeted = false;
-        }
+            resetCoveredBy(cells);
+            cells = cells;
 
-        resetCoveredBy(cells);
-        cells = cells;
-        teamToMove = !teamToMove;
+            teamToMove = !teamToMove;
+        }
     }
 
     function dragcancel()
