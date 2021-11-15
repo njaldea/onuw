@@ -1,11 +1,11 @@
 <script lang='ts'>
     import Board from '$components/chess/Board.svelte';
     import { getCells } from '$lib/chess';
-    const { dimension, cells, teams } = getCells();
+    const { dimension, cells, players } = getCells();
 </script>
 
 <div>
-    <Board flipped={true} {teams} {cells} {dimension}/>
+    <Board flipped={true} {players} {cells} {dimension}/>
 </div>
 
 <style>

@@ -3,16 +3,16 @@
     import { IBoard, Board } from '$lib/chess/Board';
 
     import type { Cell } from '$lib/chess/Cell';
-    import type { Kingdom } from '$lib/chess';
+    import type { Player } from '$lib/chess/Player';
 
     export let cells: Cell[];
-    export let teams: Kingdom[];
+    export let players: Player[];
     export let dimension: [number, number];
     export let flipped: boolean;
 
     let teamToMove = true; // true == white
 
-    const board: IBoard = new Board(teams, cells, dimension);
+    const board: IBoard = new Board(players, cells, dimension);
 
     function dragconfirm({ detail: { from, to } })
     {

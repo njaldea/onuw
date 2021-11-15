@@ -8,6 +8,7 @@
     "chatter:dev": "npm run dev -w projects/chatters",
     "frontend:dev": "npm run dev -w projects/frontend",
     "dev": "run-p frontend:dev chatter:dev",
+    "build": "npm run frontend:build",
     "heroku:publish": "git subtree push --prefix projects/chatters heroku master"
   },
   "repository": {

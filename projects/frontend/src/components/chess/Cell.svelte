@@ -1,6 +1,6 @@
 <script lang='ts'>
     import { createEventDispatcher } from 'svelte';
-    import type { Piece } from '$lib/chess/types';
+    import type { Piece } from '$lib/chess/Piece';
 
     export let id: number;
     export let alt: boolean;
