@@ -1,5 +1,5 @@
-import { Piece } from '../types/Chess';
-import type { PieceGetter, CellBoundCheck } from '../types/Chess';
+import type { PieceGetter, CellBoundCheck } from '$lib/chess/Piece';
+import { Piece } from '$lib/chess/Piece';
 
 export default class Knight extends Piece {
 	constructor(team: boolean, isCellInBound: CellBoundCheck, pieceGetter: PieceGetter) {

@@ -1,13 +1,17 @@
-import { Piece } from '../types/Chess';
-import type { PieceGetter, CellBoundCheck } from '../types/Chess';
+import type { PieceGetter, CellBoundCheck } from '$lib/chess/Piece';
+import { Piece } from '$lib/chess/Piece';
 
-export default class Bishop extends Piece {
+export default class Queen extends Piece {
 	constructor(team: boolean, isCellInBound: CellBoundCheck, pieceGetter: PieceGetter) {
-		super('B', team, isCellInBound, pieceGetter);
+		super('Q', team, isCellInBound, pieceGetter);
 	}
 
 	getPossibleMoves(r: number, f: number): [number, number][] {
 		return [].concat(
+			this.moves(r, f, 1, 0, false),
+			this.moves(r, f, -1, 0, false),
+			this.moves(r, f, 0, 1, false),
+			this.moves(r, f, 0, -1, false),
 			this.moves(r, f, 1, 1, false),
 			this.moves(r, f, -1, 1, false),
 			this.moves(r, f, 1, -1, false),
@@ -17,6 +21,10 @@ export default class Bishop extends Piece {
 
 	getSupportingMoves(r: number, f: number): [number, number][] {
 		return [].concat(
+			this.moves(r, f, 1, 0, true),
+			this.moves(r, f, -1, 0, true),
+			this.moves(r, f, 0, 1, true),
+			this.moves(r, f, 0, -1, true),
 			this.moves(r, f, 1, 1, true),
 			this.moves(r, f, -1, 1, true),
 			this.moves(r, f, 1, -1, true),

@@ -19,19 +19,3 @@ export abstract class Piece {
 	abstract getPossibleMoves(r: number, f: number): [number, number][];
 	abstract getSupportingMoves(r: number, f: number): [number, number][];
 }
-
-export class Cell {
-	constructor(i: number, pos: [number, number]) {
-		this.id = i;
-		this.piece = null;
-		this.targeted = false;
-		this.position = pos;
-		this.coveredby = [];
-	}
-
-	id: number;
-	piece: null | Piece;
-	targeted: boolean;
-	position: [number, number];
-	coveredby: number[];
-}

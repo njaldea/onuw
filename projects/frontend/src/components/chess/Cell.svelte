@@ -1,6 +1,7 @@
 <script lang='ts'>
     import { createEventDispatcher } from 'svelte';
-    import type { Piece } from '$lib/types/Chess';
+    import type { Piece } from '$lib/chess/types';
+
     export let id: number;
     export let alt: boolean;
     export let piece: null|Piece;
@@ -19,9 +20,9 @@
     {
         const matches = candidates.filter(c => c !== origin.parentElement && c.classList.contains("cell"));
         if (matches.length > 0) {
-            matches[0].dispatchEvent(new CustomEvent("dragconfirm", { detail: { from: id } }));
+            matches[0].dispatchEvent(new CustomEvent("piecedragconfirm", { detail: { from: id } }));
         } else {
-            dispatch("dragcancel");
+            dispatch("piecedragcancel");
         }
     }
 
@@ -29,11 +30,11 @@
 
     function dragconfirm(ev: CustomEvent)
     {
-        dispatch("dragconfirm", { from: ev.detail.from, to: id });
+        dispatch("piecedragconfirm", { from: ev.detail.from, to: id });
     }
 </script>
 
-<div class:targeted class="cell" class:alt on:dragconfirm={dragconfirm}>
+<div class:targeted class="cell" class:alt on:piecedragconfirm={dragconfirm}>
     {#if piece !== null}
         <div class="boundedpiece" use:draggable={{ piece: piece }}>
             <div class="piece" class:team={piece.team}>{piece.role}</div>
