@@ -1,4 +1,3 @@
-
 import type { Piece } from '$lib/chess/Piece';
 import { spring } from 'svelte/motion';
 

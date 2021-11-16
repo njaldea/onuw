@@ -25,16 +25,6 @@ export default class Pawn extends Piece {
                 retval.push(nextCell);
             }
 
-            if (this.hasMoved === false && retval.length === 1) {
-                const nextNextCell = this.transform(r, f, 2, 0);
-                if (
-                    this.isCellInBound(nextNextCell[0], nextNextCell[1]) &&
-                    this.pieceGetter(nextNextCell[0], nextNextCell[1]) == null
-                ) {
-                    retval.push(nextNextCell);
-                }
-            }
-
             const diagonalCheck = (p: [number, number]) => {
                 const piece = this.pieceGetter(p[0], p[1]);
                 return piece && piece.team !== this.team;

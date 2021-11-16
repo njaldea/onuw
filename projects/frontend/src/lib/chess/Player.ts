@@ -81,12 +81,12 @@ export class Player8x8 extends Player {
     fillDefault(cells: Cell[]): void {
         const order = [
             this.rooks[0],
-            this.knights[0],
-            this.bishops[0],
-            this.team ? this.king : this.queens[0],
-            this.team ? this.queens[0] : this.king,
-            this.bishops[0],
-            this.knights[0],
+            null, // this.knights[0],
+            null, // this.bishops[0],
+            this.team ? this.king : null, // this.queens[0],
+            this.team ? null /* this.queens[0] */ : this.king,
+            null, // this.bishops[0],
+            null, // this.knights[0],
             this.rooks[0],
             this.pawns[0],
             this.pawns[1],

@@ -23,8 +23,8 @@ export class Board implements IBoard {
     }
 
     movePiece(from: number, to: number): boolean {
-        if (this.doesCellContainKing(from) && Math.abs(from - to) === 2) {
-            return this.moveKingCastle(from, to);
+        if (this.doesCellContainKing(from)) {
+            return this.moveKing(from, to);
         }
         return this.movePieceStandard(from, to);
     }
@@ -40,18 +40,19 @@ export class Board implements IBoard {
         }
     }
 
-    setTargetedMarkings(id: number): void {
+    getTargetGenerator(id: number): Generator<number, void, unknown> {
         if (this.doesCellContainKing(id)) {
-            this.setKingTargetedMarkings(id);
+            return this.getKingTargets(id);
+        } else if (this.doesCellContainPawn(id)) {
+            return this.getPawnTargets(id);
         } else {
-            const cell = this.cells[id];
-            if (cell.piece) {
-                for (const [rank, file] of cell.piece.getPossibleMoves(
-                    ...this.cells[id].position
-                )) {
-                    this.cells[rank * this.dimension[0] + file].targeted = true;
-                }
-            }
+            return this.getDefaultTargets(id);
+        }
+    }
+
+    setTargetedMarkings(id: number): void {
+        for (const targetid of this.getTargetGenerator(id)) {
+            this.cells[targetid].targeted = true;
         }
     }
 
@@ -71,40 +72,41 @@ export class Board implements IBoard {
         }
     }
 
-    movePieceStandard(from: number, to: number): boolean {
+    takeCell(from: number, to: number): void {
         const fromcell = this.cells[from];
         const tocell = this.cells[to];
-        if (tocell.targeted) {
-            const piece = fromcell.piece;
-            tocell.piece = piece;
-            tocell.piece.hasMoved = true;
-            fromcell.piece = null;
+        const piece = fromcell.piece;
+        tocell.piece = piece;
+        tocell.piece.hasMoved = true;
+        fromcell.piece = null;
+    }
+
+    movePieceStandard(from: number, to: number): boolean {
+        if (this.cells[to].targeted) {
+            this.takeCell(from, to);
             return true;
         }
         return false;
     }
 
-    moveKingCastle(from: number, to: number): boolean {
+    moveKing(from: number, to: number): boolean {
         if (this.cells[to].targeted) {
-            const delta = to > from ? +1 : -1;
+            if (Math.abs(from - to) === 2) {
+                const delta = to > from ? +1 : -1;
+                const rookDistance = to > from ? 4 : 3;
 
-            const kingCell = this.cells[from];
+                const kingid = from;
+                const rookid = from + delta * rookDistance;
 
-            const targetKingCell = this.cells[from + delta * 2];
-            targetKingCell.piece = this.cells[from].piece;
-            targetKingCell.piece.hasMoved = true;
-            kingCell.piece = null;
-
-            const targetRookCell = this.cells[from + delta * 1];
-
-            const rookCell = this.cells[from + delta * 3].piece
-                ? this.cells[from + delta * 3]
-                : this.cells[from + delta * 4];
-
-            targetRookCell.piece = rookCell.piece;
-            targetRookCell.piece.hasMoved = true;
-            rookCell.piece = null;
-            return true;
+                const kingrow = Math.floor(kingid / this.dimension[0]);
+                const rookrow = Math.floor(rookid / this.dimension[0]);
+                if (rookrow === kingrow) {
+                    this.takeCell(kingid, kingid + delta * 2);
+                    this.takeCell(rookid, kingid + delta * 1);
+                    return true;
+                }
+            }
+            return this.movePieceStandard(from, to);
         }
         return false;
     }
@@ -114,18 +116,34 @@ export class Board implements IBoard {
         return cell.piece != null && this.players.find((t) => t.king === cell.piece) != null;
     }
 
-    setKingTargetedMarkings(id: number): void {
+    doesCellContainPawn(id: number): boolean {
         const cell = this.cells[id];
-        for (const p of cell.piece.getPossibleMoves(...cell.position)) {
-            const targetcell = this.cells[p[0] * this.dimension[0] + p[1]];
-            if (!this.isCellSupportedByTeam(targetcell, !cell.piece.team)) {
-                targetcell.targeted = true;
+        return cell.piece != null && this.players.find((t) => t.pawns.includes(cell.piece)) != null;
+    }
+
+    *getPawnTargets(id: number): Generator<number, void, unknown> {
+        for (const targetid of this.getDefaultTargets(id)) {
+            yield targetid;
+        }
+        const cell = this.cells[id];
+        if (!cell.piece.hasMoved) {
+            const targetid = id + (cell.piece.team ? +16 : -16);
+            if (0 <= targetid && targetid < this.cells.length) {
+                yield targetid;
+            }
+        }
+    }
+
+    *getKingTargets(id: number): Generator<number, void, unknown> {
+        const cell = this.cells[id];
+        for (const targetid of this.getDefaultTargets(id)) {
+            if (!this.isCellSupportedByTeam(this.cells[targetid], !cell.piece.team)) {
+                yield targetid;
             }
         }
 
         if (!cell.piece.hasMoved) {
             const rookcellsids = [id - 3, id + 4];
-            console.log(rookcellsids);
             for (const rid of rookcellsids) {
                 const rcell = this.cells[rid];
 
@@ -144,10 +162,17 @@ export class Board implements IBoard {
                         }
                     }
                     if (cancastle) {
-                        this.cells[cell.id + delta * 2].targeted = true;
+                        yield cell.id + delta * 2;
                     }
                 }
             }
+        }
+    }
+
+    *getDefaultTargets(id: number): Generator<number, void, unknown> {
+        const cell = this.cells[id];
+        for (const [rank, file] of cell.piece.getPossibleMoves(...cell.position)) {
+            yield rank * this.dimension[0] + file;
         }
     }
 
