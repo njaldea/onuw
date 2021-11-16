@@ -16,6 +16,58 @@ export abstract class Piece {
     pieceGetter: PieceGetter;
     isCellInBound: CellBoundCheck;
 
-    abstract getPossibleMoves(r: number, f: number): [number, number][];
-    abstract getSupportingMoves(r: number, f: number): [number, number][];
+    abstract getPossibleMoves(r: number, f: number): Generator<[number, number]>;
+    abstract getSupportingMoves(r: number, f: number): Generator<[number, number]>;
+}
+
+function* getMoves(
+    self: Piece,
+    r: number,
+    f: number,
+    rd: number,
+    fd: number,
+    limit: null | number,
+    supporting: boolean
+): Generator<[number, number]> {
+    for (let i = 0; limit == null || i < limit; ++i) {
+        const rank = r + rd * (i + 1);
+        const file = f + fd * (i + 1);
+        if (self.isCellInBound(rank, file)) {
+            const piece = self.pieceGetter(rank, file);
+            if (piece != null && piece.team === self.team) {
+                if (supporting) {
+                    yield [rank, file];
+                }
+                break;
+            }
+            yield [rank, file];
+            if (piece != null) {
+                break;
+            }
+        } else {
+            break;
+        }
+    }
+}
+
+export function* getPossibleMoves(
+    self: Piece,
+    r: number,
+    f: number,
+    rd: number,
+    fd: number,
+    limit: null | number = null
+): Generator<[number, number]> {
+    yield* getMoves(self, r, f, rd, fd, limit, false);
+}
+
+export function* getSupportingMoves(
+    self: Piece,
+    r: number,
+    f: number,
+    rd: number,
+    fd: number,
+    limit: null | number = null
+): Generator<[number, number]> {
+    yield* getMoves(self, r, f, rd, fd, limit, true);
 }

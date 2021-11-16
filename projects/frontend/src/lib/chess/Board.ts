@@ -40,13 +40,13 @@ export class Board implements IBoard {
         }
     }
 
-    getTargetGenerator(id: number): Generator<number, void, unknown> {
+    *getTargetGenerator(id: number): Generator<number> {
         if (this.doesCellContainKing(id)) {
-            return this.getKingTargets(id);
+            yield* this.getKingTargets(id);
         } else if (this.doesCellContainPawn(id)) {
-            return this.getPawnTargets(id);
+            yield* this.getPawnTargets(id);
         } else {
-            return this.getDefaultTargets(id);
+            yield* this.getDefaultTargets(id);
         }
     }
 
@@ -121,7 +121,7 @@ export class Board implements IBoard {
         return cell.piece != null && this.players.find((t) => t.pawns.includes(cell.piece)) != null;
     }
 
-    *getPawnTargets(id: number): Generator<number, void, unknown> {
+    *getPawnTargets(id: number): Generator<number> {
         for (const targetid of this.getDefaultTargets(id)) {
             yield targetid;
         }
@@ -134,7 +134,7 @@ export class Board implements IBoard {
         }
     }
 
-    *getKingTargets(id: number): Generator<number, void, unknown> {
+    *getKingTargets(id: number): Generator<number> {
         const cell = this.cells[id];
         for (const targetid of this.getDefaultTargets(id)) {
             if (!this.isCellSupportedByTeam(this.cells[targetid], !cell.piece.team)) {
@@ -169,7 +169,7 @@ export class Board implements IBoard {
         }
     }
 
-    *getDefaultTargets(id: number): Generator<number, void, unknown> {
+    *getDefaultTargets(id: number): Generator<number> {
         const cell = this.cells[id];
         for (const [rank, file] of cell.piece.getPossibleMoves(...cell.position)) {
             yield rank * this.dimension[0] + file;

@@ -16,13 +16,11 @@ export default class Pawn extends Piece {
         this.transform = moveTransformer;
     }
 
-    getPossibleMoves(r: number, f: number): [number, number][] {
-        const retval: [number, number][] = [];
-
+    *getPossibleMoves(r: number, f: number): Generator<[number, number]> {
         const nextCell = this.transform(r, f, 1, 0);
         if (this.isCellInBound(nextCell[0], nextCell[1])) {
             if (this.pieceGetter(nextCell[0], nextCell[1]) == null) {
-                retval.push(nextCell);
+                yield nextCell;
             }
 
             const diagonalCheck = (p: [number, number]) => {
@@ -30,30 +28,23 @@ export default class Pawn extends Piece {
                 return piece && piece.team !== this.team;
             };
 
-            this.addCell(retval, this.transform(r, f, 1, 1), diagonalCheck);
-            this.addCell(retval, this.transform(r, f, 1, -1), diagonalCheck);
+            yield* this.diagonalMove(this.transform(r, f, 1, 1), diagonalCheck);
+            yield* this.diagonalMove(this.transform(r, f, 1, -1), diagonalCheck);
         }
-
-        return retval;
     }
 
-    getSupportingMoves(r: number, f: number): [number, number][] {
-        const retval: [number, number][] = [];
-
-        this.addCell(retval, this.transform(r, f, 1, 1), () => true);
-        this.addCell(retval, this.transform(r, f, 1, -1), () => true);
-
-        return retval;
+    *getSupportingMoves(r: number, f: number): Generator<[number, number]> {
+        yield* this.diagonalMove(this.transform(r, f, 1, 1));
+        yield* this.diagonalMove(this.transform(r, f, 1, -1));
     }
 
-    addCell(
-        out: [number, number][],
+    *diagonalMove(
         [rank, file]: [number, number],
-        predicate: (p: [number, number]) => boolean
-    ): void {
+        predicate: (p: [number, number]) => boolean = null
+    ): Generator<[number, number]> {
         if (this.isCellInBound(rank, file)) {
-            if (predicate([rank, file])) {
-                out.push([rank, file]);
+            if (!predicate || predicate([rank, file])) {
+                yield [rank, file];
             }
         }
     }
