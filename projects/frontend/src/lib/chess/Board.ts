@@ -61,11 +61,11 @@ export class Board implements IBoard {
         const [rcount, ccount] = this.dimension;
         for (let r = 0; r < rcount; ++r) {
             for (let c = 0; c < ccount; ++c) {
-                const cell = this.cells[r * 8 + c];
+                const cell = this.cells[(r * ccount) + c];
                 if (cell.piece) {
                     const moves = cell.piece.getSupportingMoves(r, c);
                     for (const [rank, file] of moves) {
-                        this.cells[rank * 8 + file].coveredby.push(cell.id);
+                        this.cells[(rank * ccount) + file].coveredby.push(cell.id);
                     }
                 }
             }
@@ -98,8 +98,8 @@ export class Board implements IBoard {
                 const kingid = from;
                 const rookid = from + delta * rookDistance;
 
-                const kingrow = Math.floor(kingid / this.dimension[0]);
-                const rookrow = Math.floor(rookid / this.dimension[0]);
+                const kingrow = Math.floor(kingid / this.dimension[1]);
+                const rookrow = Math.floor(rookid / this.dimension[1]);
                 if (rookrow === kingrow) {
                     this.takeCell(kingid, kingid + delta * 2);
                     this.takeCell(rookid, kingid + delta * 1);
@@ -125,11 +125,20 @@ export class Board implements IBoard {
         for (const targetid of this.getDefaultTargets(id)) {
             yield targetid;
         }
-        const cell = this.cells[id];
-        if (!cell.piece.hasMoved) {
-            const targetid = id + (cell.piece.team ? +16 : -16);
-            if (0 <= targetid && targetid < this.cells.length) {
-                yield targetid;
+
+        if (this.dimension[0] >= 8)
+        {
+            const row = Math.floor(id / this.dimension[1]);
+            if (row === 1 || row === this.dimension[0] - 2)
+            {
+                const cell = this.cells[id];
+                if (!cell.piece.hasMoved) {
+                    const rowcount = this.dimension[1] * 2;
+                    const targetid = id + (cell.piece.team ? rowcount : -rowcount);
+                    if (0 <= targetid && targetid < this.cells.length) {
+                        yield targetid;
+                    }
+                }
             }
         }
     }
@@ -172,7 +181,7 @@ export class Board implements IBoard {
     *getDefaultTargets(id: number): Generator<number> {
         const cell = this.cells[id];
         for (const [rank, file] of cell.piece.getPossibleMoves(...cell.position)) {
-            yield rank * this.dimension[0] + file;
+            yield rank * this.dimension[1] + file;
         }
     }
 

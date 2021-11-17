@@ -27,7 +27,7 @@ export class Player {
     }
 }
 
-export class Player8x8 extends Player {
+export class ChessPlayer extends Player {
     team: boolean;
     isCellInBound: CellBoundCheck;
     pieceGetter: PieceGetter;
