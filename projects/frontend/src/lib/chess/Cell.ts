@@ -5,6 +5,7 @@ export class Cell {
         this.id = i;
         this.piece = null;
         this.targeted = false;
+        this.touched = false;
         this.position = pos;
         this.coveredby = [];
     }
@@ -12,6 +13,7 @@ export class Cell {
     id: number;
     piece: null | Piece;
     targeted: boolean;
+    touched: boolean;
     position: [number, number];
     coveredby: number[];
 }

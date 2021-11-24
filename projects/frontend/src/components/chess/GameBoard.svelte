@@ -16,7 +16,7 @@
 
     function dragconfirm({ detail: { from, to } })
     {
-        if (teamToMove == null || teamToMove === board.getTeamOnCell(from))
+        if (teamToMove == null || (from.piece && teamToMove === from.piece.team))
         {
             if (board.movePiece(from, to) && teamToMove != null)
             {
@@ -35,18 +35,29 @@
         cells = cells;
     }
 
-    function dragpiecestart({ detail: { id } }: { detail: { id: number } })
+    function dragpiecestart({ detail: { cell } }: { detail: { cell: Cell } })
     {
-        if (teamToMove == null || teamToMove === board.getTeamOnCell(id))
+        if (teamToMove == null || (cell.piece && teamToMove === cell.piece.team))
         {
-            board.setTargetedMarkings(id);
+            board.setTargetedMarkings(cell);
             cells = cells;
+        }
+    }
+
+    function* boardOrder(cells: Cell[], flipped: boolean)
+    {
+        const [ start, end, delta ] = flipped ? 
+            [0, cells.length, 1] :
+            [cells.length - 1, -1, -1];
+        for (let i = start; i != end; i += delta)
+        {
+            yield cells[i];
         }
     }
 </script>
 
 <div class='board' style={`--rcount: ${dimension[0]}; --ccount: ${dimension[1]};`}>
-    {#each flipped ? cells : cells.slice().reverse() as cell (cell.id)}
+    {#each [ ...boardOrder(cells, flipped) ] as cell (cell.id)}
         <CellComponent
             cell={cell}
             alt={dimension[1] % 2 === 0 ? Math.floor(cell.id / dimension[1]) % 2 ^ cell.id % 2 : cell.id % 2}

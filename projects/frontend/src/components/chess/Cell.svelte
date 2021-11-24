@@ -14,7 +14,7 @@
     function start()
     {
         grabbed = true;
-        dispatch("piecedragstart", { id: cell.id });
+        dispatch("piecedragstart", { cell });
     }
 
     function end(origin: HTMLDivElement, candidates: Element[])
@@ -32,12 +32,12 @@
 
     function getcellidresp(ev: CustomEvent)
     {
-        dispatch("piecedragconfirm", { from: cell.id, to: ev.detail.to });
+        dispatch("piecedragconfirm", { from: cell, to: ev.detail.to });
     }
 
     function getcellid(ev: CustomEvent)
     {
-        const response = new CustomEvent("getcellidresp", { bubbles: true, detail: { to: cell.id } });
+        const response = new CustomEvent("getcellidresp", { bubbles: true, detail: { to: cell } });
         ev.detail.dispatchEvent(response);
     }
 </script>
