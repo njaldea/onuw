@@ -5,7 +5,8 @@
     export let alt: boolean;
     export let cell: Cell;
 
-    import action from '$lib/actions/draggable';
+    import draggableaction from '$lib/actions/draggable';
+    import cellinteropaction from '$lib/actions/cellinterop';
 
     const dispatch = createEventDispatcher();
 
@@ -22,24 +23,14 @@
         grabbed = false;
         const matches = candidates.filter(c => c !== origin.parentElement && c.classList.contains("cell"));
         if (matches.length > 0) {
-            matches[0].dispatchEvent(new CustomEvent("getcellid", { detail: origin }));
+            matches[0].dispatchEvent(new CustomEvent("getcellid", { detail: { target: origin } }));
         } else {
             dispatch("piecedragcancel");
         }
     }
 
-    const draggable = action(start, end);
-
-    function getcellidresp(ev: CustomEvent)
-    {
-        dispatch("piecedragconfirm", { from: cell, to: ev.detail.to });
-    }
-
-    function getcellid(ev: CustomEvent)
-    {
-        const response = new CustomEvent("getcellidresp", { bubbles: true, detail: { to: cell } });
-        ev.detail.dispatchEvent(response);
-    }
+    const draggable = draggableaction(start, end);
+    const cellinterop = cellinteropaction(cell);
 </script>
 
 <div
@@ -47,8 +38,8 @@
     class:targeted={cell.targeted}
     class="cell"
     class:alt
-    on:getcellid={getcellid}
-    on:getcellidresp={getcellidresp}
+    use:cellinterop
+    on:piecedragconfirm={ev => dispatch("piecedragconfirm", ev.detail)}
 >
     {#if cell.piece !== null}
         <div class="boundedpiece" use:draggable={{ piece: cell.piece }}>

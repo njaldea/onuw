@@ -1,8 +1,13 @@
 import type { Cell } from '$lib/chess/Cell';
 import type { Player } from '$lib/chess/Player';
 
+export type Move = {
+    next: () => void;
+    prev: () => void;
+};
+
 export abstract class IBoard {
-    abstract movePiece(from: Cell, to: Cell): boolean;
+    abstract movePiece(from: Cell, to: Cell): null | Move;
     abstract clearTargetedMarkings(): void;
     abstract setTargetedMarkings(cell: Cell): void;
     abstract refreshCoveredByCells(): void;
@@ -21,7 +26,7 @@ export class Board implements IBoard {
         this.refreshCoveredByCells();
     }
 
-    movePiece(from: Cell, to: Cell): boolean {
+    movePiece(from: Cell, to: Cell): null | Move {
         if (this.doesCellContainKing(from)) {
             return this.moveKing(from, to);
         }
@@ -66,22 +71,48 @@ export class Board implements IBoard {
         }
     }
 
-    takeCell(from: Cell, to: Cell): void {
-        to.piece = from.piece;
-        to.touched = true;
-        from.touched = true;
-        from.piece = null;
+    takeCell(from: Cell, to: Cell): Move {
+        const prevstate = {
+            to: to,
+            from: from,
+            topiece: to.piece,
+            frompiece: from.piece,
+            totouched: to.touched,
+            fromtouched: from.touched
+        };
+        const prev = () => {
+            prevstate.to.piece = prevstate.topiece;
+            prevstate.to.touched = prevstate.totouched;
+            prevstate.from.piece = prevstate.frompiece;
+            prevstate.from.touched = prevstate.fromtouched;
+        };
+
+        const nextstate = {
+            to: to,
+            from: from,
+            topiece: from.piece,
+            frompiece: null,
+            totouched: true,
+            fromtouched: true
+        };
+        const next = () => {
+            nextstate.to.piece = nextstate.topiece;
+            nextstate.to.touched = nextstate.totouched;
+            nextstate.from.piece = nextstate.frompiece;
+            nextstate.from.touched = nextstate.fromtouched;
+        };
+
+        return { next, prev };
     }
 
-    movePieceStandard(from: Cell, to: Cell): boolean {
+    movePieceStandard(from: Cell, to: Cell): null | Move {
         if (to.targeted) {
-            this.takeCell(from, to);
-            return true;
+            return this.takeCell(from, to);
         }
-        return false;
+        return null;
     }
 
-    moveKing(from: Cell, to: Cell): boolean {
+    moveKing(from: Cell, to: Cell): null | Move {
         if (to.targeted) {
             if (Math.abs(from.id - to.id) === 2) {
                 const delta = to.id > from.id ? +1 : -1;
@@ -100,16 +131,25 @@ export class Board implements IBoard {
                             (t) => t.king === kingcell.piece && t.rook === rookcell.piece
                         ) != null
                     ) {
-                        this.takeCell(kingcell, this.cells[kingid + delta * 2]);
-                        this.takeCell(rookcell, this.cells[kingid + delta * 1]);
-                        return true;
+                        const kingmove = this.takeCell(kingcell, this.cells[kingid + delta * 2]);
+                        const rookmove = this.takeCell(rookcell, this.cells[kingid + delta * 1]);
+                        return {
+                            next: () => {
+                                kingmove.next();
+                                rookmove.next();
+                            },
+                            prev: () => {
+                                kingmove.prev();
+                                rookmove.prev();
+                            }
+                        };
                     }
-                    return false;
+                    return null;
                 }
             }
             return this.movePieceStandard(from, to);
         }
-        return false;
+        return null;
     }
 
     doesCellContainKing(cell: Cell): boolean {

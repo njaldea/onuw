@@ -7,7 +7,7 @@
     let rcount = 8;
     let ccount = 4;
 
-    function populatecells(rr, cc)
+    function populatecells(rr: number, cc: number)
     {
         let cells: Cell[] = [];
         for (let r = 0; r < rr; ++r) {
@@ -71,25 +71,27 @@
         max-width: calc(100px * 8);
         display: flex;
     }
+
     .board {
         width: 80%;
         z-index: 1;
     }
+
     .panel {
         width: 20%;
         z-index: 0;
     }
+
     .panel > * {
         width: 100%;
     }
+
     label {
         display: flex;
         gap: 5px;
     }
+
     label > * {
         width: 50%;
-    }
-    button.active {
-        outline: 2px solid red;
     }
 </style>

@@ -1,6 +1,6 @@
 <script lang='ts'>
     import CellComponent from '$components/chess/Cell.svelte';
-    import { IBoard, Board } from '$lib/chess/Board';
+    import { IBoard, Board, Move } from '$lib/chess/Board';
 
     import type { Cell } from '$lib/chess/Cell';
     import type { Player } from '$lib/chess/Player';
@@ -14,13 +14,56 @@
 
     const board: IBoard = new Board(players, cells, dimension);
 
+    const history: Move[] = [];
+    const redoqueue: Move[] = [];
+
+    function undo()
+    {
+        if (history.length > 0)
+        {
+            const move = history.pop();
+            redoqueue.push(move);
+            move.prev();
+
+            board.refreshCoveredByCells();
+            cells = cells;
+            if (teamToMove != null)
+            {
+                teamToMove = !teamToMove;
+            }
+        }
+    }
+
+    function redo()
+    {
+        if (redoqueue.length > 0) {
+            const move = redoqueue.shift();
+            history.push(move);
+            move.next();
+
+            board.refreshCoveredByCells();
+            cells = cells;
+            if (teamToMove != null)
+            {
+                teamToMove = !teamToMove;
+            }
+        }
+    }
+
     function dragconfirm({ detail: { from, to } })
     {
         if (teamToMove == null || (from.piece && teamToMove === from.piece.team))
         {
-            if (board.movePiece(from, to) && teamToMove != null)
+            const move = board.movePiece(from, to);
+            if (move) 
             {
-                teamToMove = !teamToMove;
+                move.next();
+                history.push(move);
+                redoqueue.splice(0, redoqueue.length);
+                if (teamToMove != null)
+                {
+                    teamToMove = !teamToMove;
+                }
             }
 
             board.clearTargetedMarkings();
@@ -67,6 +110,8 @@
         />
     {/each}
 </div>
+<button on:click={undo}>Undo</button>
+<button on:click={redo}>Redo</button>
 
 <style>
     .board {
