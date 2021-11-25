@@ -37,7 +37,7 @@
     function redo()
     {
         if (redoqueue.length > 0) {
-            const move = redoqueue.shift();
+            const move = redoqueue.pop();
             history.push(move);
             move.next();
 
