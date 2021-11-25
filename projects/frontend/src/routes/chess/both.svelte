@@ -1,13 +1,14 @@
-<div class='root'>
-    <div class='board'>
+<div class="root">
+    <div class="board">
         <p>white</p>
-        <iframe title="white" src="/chess/white"></iframe>
+        <iframe title="white" src="/chess/white" />
     </div>
-    <div class='board'>
+    <div class="board">
         <p>black</p>
-        <iframe title="black" src="/chess/black"></iframe>
+        <iframe title="black" src="/chess/black" />
     </div>
 </div>
+
 <style>
     .root {
         display: flex;

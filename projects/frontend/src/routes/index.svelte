@@ -1,4 +1,4 @@
-<script lang='ts'>
+<script lang="ts">
     import { goto } from '$app/navigation';
     let name = '';
 
@@ -9,9 +9,8 @@
     }
 </script>
 
-<input type='text' bind:value={name}>
+<input type="text" bind:value={name} />
 <button on:click={next}>Next</button>
-
 
 <style>
     input {

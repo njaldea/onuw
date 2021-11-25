@@ -1,26 +1,26 @@
 {
-  "name": "@onuw/chatters",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "dev": "node src/index.js",
-    "start": "npm run dev"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/njaldea/onuw.git"
-  },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/njaldea/onuw/issues"
-  },
-  "homepage": "https://github.com/njaldea/onuw#readme",
-  "dependencies": {
-    "dotenv": "^10.0.0",
-    "find-config": "^1.0.0",
-    "ws": "^8.2.2"
-  },
-  "type": "module"
+    "name": "@onuw/chatters",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "dev": "node src/index.js",
+        "start": "npm run dev"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/njaldea/onuw.git"
+    },
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/njaldea/onuw/issues"
+    },
+    "homepage": "https://github.com/njaldea/onuw#readme",
+    "dependencies": {
+        "dotenv": "^10.0.0",
+        "find-config": "^1.0.0",
+        "ws": "^8.2.2"
+    },
+    "type": "module"
 }

@@ -1,4 +1,4 @@
-<script lang='ts'>
+<script lang="ts">
     import { createEventDispatcher } from 'svelte';
     import type { Cell } from '$lib/chess/Cell';
 
@@ -12,20 +12,20 @@
 
     let grabbed = false;
 
-    function start()
-    {
+    function start() {
         grabbed = true;
-        dispatch("piecedragstart", { cell });
+        dispatch('piecedragstart', { cell });
     }
 
-    function end(origin: HTMLDivElement, candidates: Element[])
-    {
+    function end(origin: HTMLDivElement, candidates: Element[]) {
         grabbed = false;
-        const matches = candidates.filter(c => c !== origin.parentElement && c.classList.contains("cell"));
+        const matches = candidates.filter(
+            (c) => c !== origin.parentElement && c.classList.contains('cell')
+        );
         if (matches.length > 0) {
-            matches[0].dispatchEvent(new CustomEvent("getcellid", { detail: { target: origin } }));
+            matches[0].dispatchEvent(new CustomEvent('getcellid', { detail: { target: origin } }));
         } else {
-            dispatch("piecedragcancel");
+            dispatch('piecedragcancel');
         }
     }
 
@@ -39,7 +39,7 @@
     class="cell"
     class:alt
     use:cellinterop
-    on:piecedragconfirm={ev => dispatch("piecedragconfirm", ev.detail)}
+    on:piecedragconfirm={(ev) => dispatch('piecedragconfirm', ev.detail)}
 >
     {#if cell.piece !== null}
         <div class="boundedpiece" use:draggable={{ piece: cell.piece }}>

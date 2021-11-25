@@ -1,31 +1,38 @@
 {
-  "name": "onuw",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "frontend:build": "npm run build -w projects/frontend",
-    "chatter:dev": "npm run dev -w projects/chatters",
-    "frontend:dev": "npm run dev -w projects/frontend",
-    "dev": "run-p frontend:dev chatter:dev",
-    "build": "npm run frontend:build",
-    "heroku:publish": "git subtree push --prefix projects/chatters heroku master"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/njaldea/onuw.git"
-  },
-  "author": "Neil Aldea",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/njaldea/onuw/issues"
-  },
-  "homepage": "https://github.com/njaldea/onuw#readme",
-  "workspaces": [
-    "projects/frontend",
-    "projects/chatters"
-  ],
-  "devDependencies": {
-    "npm-run-all": "^4.1.5"
-  }
+    "name": "onuw",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "frontend:build": "npm run build -w projects/frontend",
+        "chatter:dev": "npm run dev -w projects/chatters",
+        "frontend:dev": "npm run dev -w projects/frontend",
+        "dev": "run-p frontend:dev chatter:dev",
+        "build": "npm run frontend:build",
+        "heroku:publish": "git subtree push --prefix projects/chatters heroku master",
+        "lint": "eslint --ignore-path .gitignore .",
+        "format": "prettier --ignore-path .gitignore --ignore-path projects/frontend/.gitignore --write --plugin-search-dir=. ."
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/njaldea/onuw.git"
+    },
+    "author": "Neil Aldea",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/njaldea/onuw/issues"
+    },
+    "homepage": "https://github.com/njaldea/onuw#readme",
+    "workspaces": [
+        "projects/frontend",
+        "projects/chatters"
+    ],
+    "devDependencies": {
+        "npm-run-all": "^4.1.5",
+        "prettier": "^2.4.1",
+        "prettier-plugin-svelte": "^2.4.0",
+        "eslint": "^7.32.0",
+        "eslint-config-prettier": "^8.3.0",
+        "eslint-plugin-svelte3": "^3.2.1"
+    }
 }

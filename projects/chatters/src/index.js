@@ -19,8 +19,8 @@ function sendMessage(name, message) {
     }
 }
 
-wss.on('connection', ws => {
-    ws.on('message', message => {
+wss.on('connection', (ws) => {
+    ws.on('message', (message) => {
         console.log('received: %s', message);
         const m = JSON.parse(message);
         if (m.type === 2) {

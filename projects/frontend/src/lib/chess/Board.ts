@@ -1,32 +1,52 @@
 import type { Cell } from '$lib/chess/Cell';
 import type { Player } from '$lib/chess/Player';
+import type { Subscriber, Unsubscriber } from 'svelte/store';
 
 export type Move = {
-    next: () => void;
-    prev: () => void;
+    execute: () => boolean;
+    revert: () => boolean;
 };
 
 export abstract class IBoard {
-    abstract movePiece(from: Cell, to: Cell): null | Move;
+    abstract move(from: Cell, to: Cell): null | Move;
     abstract clearTargetedMarkings(): void;
     abstract setTargetedMarkings(cell: Cell): void;
-    abstract refreshCoveredByCells(): void;
+    abstract subscribe(cb: Subscriber<Cell[]>): () => void;
 }
 
 export class Board implements IBoard {
     players: Player[];
     cells: Cell[];
     dimension: [number, number];
+    subscribers: Subscriber<Cell[]>[];
 
     constructor(p: Player[], c: Cell[], dimension: [number, number]) {
         this.players = p;
         this.cells = c;
         this.dimension = dimension;
+        this.subscribers = [];
 
         this.refreshCoveredByCells();
     }
 
-    movePiece(from: Cell, to: Cell): null | Move {
+    subscribe(cb: (cells: Cell[]) => void): Unsubscriber {
+        cb(this.cells);
+        this.subscribers.push(cb);
+        return () => {
+            const idx = this.subscribers.indexOf(cb);
+            if (idx >= 0) {
+                this.subscribers.splice(idx, 1);
+            }
+        }
+    }
+
+    notify() {
+        for (const cb of this.subscribers) {
+            cb(this.cells);
+        }
+    }
+
+    move(from: Cell, to: Cell): null | Move {
         if (this.doesCellContainKing(from)) {
             return this.moveKing(from, to);
         }
@@ -37,6 +57,7 @@ export class Board implements IBoard {
         for (const cell of this.cells) {
             cell.targeted = false;
         }
+        this.notify();
     }
 
     *getTargetGenerator(cell: Cell): Generator<Cell> {
@@ -53,6 +74,7 @@ export class Board implements IBoard {
         for (const targetcell of this.getTargetGenerator(cell)) {
             targetcell.targeted = true;
         }
+        this.notify();
     }
 
     refreshCoveredByCells(): void {
@@ -80,12 +102,6 @@ export class Board implements IBoard {
             totouched: to.touched,
             fromtouched: from.touched
         };
-        const prev = () => {
-            prevstate.to.piece = prevstate.topiece;
-            prevstate.to.touched = prevstate.totouched;
-            prevstate.from.piece = prevstate.frompiece;
-            prevstate.from.touched = prevstate.fromtouched;
-        };
 
         const nextstate = {
             to: to,
@@ -95,14 +111,27 @@ export class Board implements IBoard {
             totouched: true,
             fromtouched: true
         };
-        const next = () => {
-            nextstate.to.piece = nextstate.topiece;
-            nextstate.to.touched = nextstate.totouched;
-            nextstate.from.piece = nextstate.frompiece;
-            nextstate.from.touched = nextstate.fromtouched;
-        };
 
-        return { next, prev };
+        return {
+            revert: () => {
+                prevstate.to.piece = prevstate.topiece;
+                prevstate.to.touched = prevstate.totouched;
+                prevstate.from.piece = prevstate.frompiece;
+                prevstate.from.touched = prevstate.fromtouched;
+                this.refreshCoveredByCells();
+                this.notify();
+                return true;
+            },
+            execute: () => {
+                nextstate.to.piece = nextstate.topiece;
+                nextstate.to.touched = nextstate.totouched;
+                nextstate.from.piece = nextstate.frompiece;
+                nextstate.from.touched = nextstate.fromtouched;
+                this.refreshCoveredByCells();
+                this.notify();
+                return true;
+            }
+        };
     }
 
     movePieceStandard(from: Cell, to: Cell): null | Move {
@@ -134,13 +163,15 @@ export class Board implements IBoard {
                         const kingmove = this.takeCell(kingcell, this.cells[kingid + delta * 2]);
                         const rookmove = this.takeCell(rookcell, this.cells[kingid + delta * 1]);
                         return {
-                            next: () => {
-                                kingmove.next();
-                                rookmove.next();
+                            execute: () => {
+                                kingmove.execute();
+                                rookmove.execute();
+                                return true;
                             },
-                            prev: () => {
-                                kingmove.prev();
-                                rookmove.prev();
+                            revert: () => {
+                                kingmove.revert();
+                                rookmove.revert();
+                                return true;
                             }
                         };
                     }

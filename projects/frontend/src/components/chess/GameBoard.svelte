@@ -1,117 +1,79 @@
-<script lang='ts'>
+<script lang="ts">
     import CellComponent from '$components/chess/Cell.svelte';
-    import { IBoard, Board, Move } from '$lib/chess/Board';
-
+    import type { IBoard, Move } from '$lib/chess/Board';
     import type { Cell } from '$lib/chess/Cell';
-    import type { Player } from '$lib/chess/Player';
 
-    export let cells: Cell[];
-    export let players: Player[];
     export let dimension: [number, number];
     export let flipped: boolean;
 
-    export let teamToMove: boolean|null = true; // true == white
+    export let teamToMove: boolean | null = true; // true == white
 
-    const board: IBoard = new Board(players, cells, dimension);
+    export let board: IBoard;
 
     const history: Move[] = [];
     const redoqueue: Move[] = [];
 
-    function undo()
-    {
-        if (history.length > 0)
+    function move(q1: Move[], q2: Move[], method: (m: Move) => boolean) {
+        if (q1.length > 0)
         {
-            const move = history.pop();
-            redoqueue.push(move);
-            move.prev();
+            const move = q1.pop();
+            q2.push(move);
 
-            board.refreshCoveredByCells();
-            cells = cells;
-            if (teamToMove != null)
+            if (method(move) && teamToMove != null)
             {
                 teamToMove = !teamToMove;
             }
         }
     }
 
-    function redo()
-    {
-        if (redoqueue.length > 0) {
-            const move = redoqueue.pop();
-            history.push(move);
-            move.next();
-
-            board.refreshCoveredByCells();
-            cells = cells;
-            if (teamToMove != null)
-            {
-                teamToMove = !teamToMove;
-            }
-        }
-    }
-
-    function dragconfirm({ detail: { from, to } })
-    {
-        if (teamToMove == null || (from.piece && teamToMove === from.piece.team))
-        {
-            const move = board.movePiece(from, to);
-            if (move) 
-            {
-                move.next();
+    function dragconfirm({ detail: { from, to } }) {
+        if (teamToMove == null || (from.piece && teamToMove === from.piece.team)) {
+            const move = board.move(from, to);
+            if (move) {
                 history.push(move);
                 redoqueue.splice(0, redoqueue.length);
-                if (teamToMove != null)
-                {
+                if (move.execute() && teamToMove != null) {
                     teamToMove = !teamToMove;
                 }
             }
 
             board.clearTargetedMarkings();
-            board.refreshCoveredByCells();
-            cells = cells;
         }
     }
 
-    function dragcancel()
-    {
+    function dragcancel() {
         board.clearTargetedMarkings();
-        cells = cells;
     }
 
-    function dragpiecestart({ detail: { cell } }: { detail: { cell: Cell } })
-    {
-        if (teamToMove == null || (cell.piece && teamToMove === cell.piece.team))
-        {
+    function dragpiecestart({ detail: { cell } }: { detail: { cell: Cell } }) {
+        if (teamToMove == null || (cell.piece && teamToMove === cell.piece.team)) {
             board.setTargetedMarkings(cell);
-            cells = cells;
         }
     }
 
-    function* boardOrder(cells: Cell[], flipped: boolean)
-    {
-        const [ start, end, delta ] = flipped ? 
-            [0, cells.length, 1] :
-            [cells.length - 1, -1, -1];
-        for (let i = start; i != end; i += delta)
-        {
+    function* boardOrder(cells: Cell[], flipped: boolean) {
+        const [start, end, delta] = flipped ? [0, cells.length, 1] : [cells.length - 1, -1, -1];
+        for (let i = start; i != end; i += delta) {
             yield cells[i];
         }
     }
 </script>
 
-<div class='board' style={`--rcount: ${dimension[0]}; --ccount: ${dimension[1]};`}>
-    {#each [ ...boardOrder(cells, flipped) ] as cell (cell.id)}
+<div class="board" style={`--rcount: ${dimension[0]}; --ccount: ${dimension[1]};`}>
+    {#each [...boardOrder($board, flipped)] as cell (cell.id)}
         <CellComponent
-            cell={cell}
-            alt={dimension[1] % 2 === 0 ? Math.floor(cell.id / dimension[1]) % 2 ^ cell.id % 2 : cell.id % 2}
+            {cell}
+            alt={dimension[1] % 2 === 0
+                ? Math.floor(cell.id / dimension[1]) % 2 ^ cell.id % 2
+                : cell.id % 2}
             on:piecedragconfirm={dragconfirm}
             on:piecedragcancel={dragcancel}
             on:piecedragstart={dragpiecestart}
         />
     {/each}
 </div>
-<button on:click={undo}>Undo</button>
-<button on:click={redo}>Redo</button>
+<button on:click={() => move(history, redoqueue, (m) => m.revert())}>Undo</button>
+<button on:click={() => move(redoqueue, history, (m) => m.execute())}>Redo</button>
 
 <style>
     .board {

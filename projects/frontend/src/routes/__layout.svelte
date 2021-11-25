@@ -1,22 +1,22 @@
-<script lang='ts'>
+<script lang="ts">
     import { onMount } from 'svelte';
     import { CHATTERS_URL } from '$lib/env';
     import wschatter from '$lib/ws-chatters';
 
     let loaded = false;
-    function connect()
-    {
-        wschatter.connect(CHATTERS_URL)
-            .then(() => loaded = true)
+    function connect() {
+        wschatter
+            .connect(CHATTERS_URL)
+            .then(() => (loaded = true))
             .catch(() => setTimeout(connect, 1000));
     }
     onMount(connect);
 </script>
 
 {#if loaded}
-    <div class='root'>
+    <div class="root">
         <div>
-            <slot></slot>
+            <slot />
         </div>
     </div>
 {/if}

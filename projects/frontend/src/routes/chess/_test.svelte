@@ -1,4 +1,4 @@
-<script lang='ts'>
+<script lang="ts">
     import EditorBoard from '$components/chess/EditorBoard.svelte';
     import type { CellBoundCheck, PieceGetter } from '$lib/chess/Piece';
     import { Player } from '$lib/chess/Player';
@@ -7,8 +7,7 @@
     let rcount = 8;
     let ccount = 4;
 
-    function populatecells(rr: number, cc: number)
-    {
+    function populatecells(rr: number, cc: number) {
         let cells: Cell[] = [];
         for (let r = 0; r < rr; ++r) {
             for (let c = 0; c < cc; ++c) {
@@ -37,15 +36,12 @@
     let rankcreator = 0;
     let tilecreator = 0;
 
-    function updatecreator(r: number, f: number)
-    {
-        if (r < rankcreator)
-        {
+    function updatecreator(r: number, f: number) {
+        if (r < rankcreator) {
             rankcreator = r;
         }
 
-        if (f < tilecreator)
-        {
+        if (f < tilecreator) {
             tilecreator = f;
         }
     }
@@ -54,13 +50,24 @@
 
 <div class="root">
     <div class="board">
-        <EditorBoard flipped={false} players={[player1, player2]} cells={cells} dimension={[rcount, ccount]}/>
+        <EditorBoard
+            flipped={false}
+            players={[player1, player2]}
+            {cells}
+            dimension={[rcount, ccount]}
+        />
     </div>
     <div class="panel">
-        <label><input type="number" min={0} bind:value={rcount}><span>max rank</span></label>
-        <label><input type="number" min={0} bind:value={ccount}><span>max file</span></label>
-        <label><input type="number" min={0} max={rcount} bind:value={rankcreator}><span>rank</span></label>
-        <label><input type="number" min={0} max={ccount} bind:value={tilecreator}><span>file</span></label>
+        <label><input type="number" min={0} bind:value={rcount} /><span>max rank</span></label>
+        <label><input type="number" min={0} bind:value={ccount} /><span>max file</span></label>
+        <label
+            ><input type="number" min={0} max={rcount} bind:value={rankcreator} /><span>rank</span
+            ></label
+        >
+        <label
+            ><input type="number" min={0} max={ccount} bind:value={tilecreator} /><span>file</span
+            ></label
+        >
     </div>
 </div>
 

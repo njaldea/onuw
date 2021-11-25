@@ -1,11 +1,14 @@
-<script lang='ts'>
+<script lang="ts">
     import GameBoard from '$components/chess/GameBoard.svelte';
     import { getCells } from '$lib/chess';
+    import { Board, IBoard } from '$lib/chess/Board';
+
     const { dimension, cells, players } = getCells();
+    const board: IBoard = new Board(players, cells, dimension);
 </script>
 
 <div>
-    <GameBoard flipped={false} {players} {cells} {dimension}/>
+    <GameBoard flipped={false} {board} {cells} {dimension} />
 </div>
 
 <style>

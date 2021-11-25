@@ -1,4 +1,4 @@
-<script lang='ts'>
+<script lang="ts">
     import CellComponent from '$components/chess/Cell.svelte';
 
     import { Cell } from '$lib/chess/Cell';
@@ -10,14 +10,12 @@
     export let flipped: boolean;
 
     const templatecells: Cell[] = [];
-    function createTemplateCell()
-    {
-        const cell = new Cell(templatecells.length, [ templatecells.length, 0 ]);
+    function createTemplateCell() {
+        const cell = new Cell(templatecells.length, [templatecells.length, 0]);
         templatecells.push(cell);
         return cell;
     }
-    for (const player of players)
-    {
+    for (const player of players) {
         createTemplateCell().piece = player.queen;
         createTemplateCell().piece = player.bishop;
         createTemplateCell().piece = player.knight;
@@ -25,33 +23,24 @@
         createTemplateCell().piece = player.pawn;
     }
 
-    function dragconfirmcopy({ detail: { from, to } })
-    {
-        if (templatecells.includes(from) && cells.includes(to)) 
-        {
+    function dragconfirmcopy({ detail: { from, to } }) {
+        if (templatecells.includes(from) && cells.includes(to)) {
             to.piece = from.piece;
             cells = cells;
         }
     }
 
-    function dragconfirm({ detail: { from, to } })
-    {
-        if (cells.includes(from) && cells.includes(to)) 
-        {
+    function dragconfirm({ detail: { from, to } }) {
+        if (cells.includes(from) && cells.includes(to)) {
             to.piece = from.piece;
             from.piece = null;
             cells = cells;
         }
     }
 
-
-    function* boardOrder(cells: Cell[], flipped: boolean)
-    {
-        const [ start, end, delta ] = flipped ? 
-            [0, cells.length, 1] :
-            [cells.length - 1, -1, -1];
-        for (let i = start; i != end; i += delta)
-        {
+    function* boardOrder(cells: Cell[], flipped: boolean) {
+        const [start, end, delta] = flipped ? [0, cells.length, 1] : [cells.length - 1, -1, -1];
+        for (let i = start; i != end; i += delta) {
             yield cells[i];
         }
     }
@@ -60,14 +49,16 @@
 <div class="root">
     <div class="template" style={`--rcount: ${templatecells.length};`}>
         {#each templatecells as cell (cell.id)}
-            <CellComponent alt={false} cell={cell} on:piecedragconfirm={dragconfirmcopy}/>
+            <CellComponent alt={false} {cell} on:piecedragconfirm={dragconfirmcopy} />
         {/each}
     </div>
-    <div class='board' style={`--rcount: ${dimension[0]}; --ccount: ${dimension[1]};`}>
-        {#each [ ...boardOrder(cells, flipped) ] as cell (cell.id)}
+    <div class="board" style={`--rcount: ${dimension[0]}; --ccount: ${dimension[1]};`}>
+        {#each [...boardOrder(cells, flipped)] as cell (cell.id)}
             <CellComponent
-                cell={cell}
-                alt={dimension[1] % 2 === 0 ? Math.floor(cell.id / dimension[1]) % 2 ^ cell.id % 2 : cell.id % 2}
+                {cell}
+                alt={dimension[1] % 2 === 0
+                    ? Math.floor(cell.id / dimension[1]) % 2 ^ cell.id % 2
+                    : cell.id % 2}
                 on:piecedragconfirm={dragconfirm}
             />
         {/each}
