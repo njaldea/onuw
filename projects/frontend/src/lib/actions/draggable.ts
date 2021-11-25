@@ -19,40 +19,34 @@ export default function (
 
         const motionUnsub = offset.subscribe((offset) => {
             div.style.transform = `translate(${offset.x}px, ${offset.y}px)`;
-            const isNotMoving = offset.x === 0 && offset.y === 0;
-            div.style.zIndex = isNotMoving ? '0' : '1';
         });
-        let track = false;
 
         function move(ev: MouseEvent) {
-            if (piece === null) return;
-            if (track === true) {
-                offsetX += ev.clientX - lastX;
-                offsetY += ev.clientY - lastY;
-                lastX = ev.clientX;
-                lastY = ev.clientY;
-                offset.set({ x: offsetX, y: offsetY });
-            }
+            offsetX += ev.clientX - lastX;
+            offsetY += ev.clientY - lastY;
+            lastX = ev.clientX;
+            lastY = ev.clientY;
+            offset.set({ x: offsetX, y: offsetY });
         }
 
-        window.addEventListener('mousemove', move);
+        let subscribed = false;
 
         function start(ev: MouseEvent) {
             if (piece === null) return;
-            if (track === true) return;
-            track = true;
 
             lastX = ev.clientX;
             lastY = ev.clientY;
 
             onstart();
+
+            if (!subscribed) {
+                subscribed = true;
+                window.addEventListener('mousemove', move);
+                window.addEventListener('mouseup', end);
+            }
         }
 
         function end() {
-            if (piece === null) return;
-            if (track === false) return;
-            track = false;
-
             offsetX = 0;
             offsetY = 0;
             offset.set({ x: 0, y: 0 });
@@ -62,17 +56,25 @@ export default function (
             const midY = rect.y + rect.height / 2;
             const candidates = document.elementsFromPoint(midX, midY);
             onend(div, candidates);
+
+            if (subscribed) {
+                subscribed = false;
+                window.removeEventListener('mousemove', move);
+                window.removeEventListener('mouseup', end);
+            }
         }
 
         div.addEventListener('mousedown', start);
-        div.addEventListener('mouseup', end);
 
         return {
             destroy: () => {
                 motionUnsub();
-                window.removeEventListener('mousemove', move);
                 div.removeEventListener('mousedown', start);
-                div.removeEventListener('mouseup', end);
+                if (subscribed) {
+                    subscribed = false;
+                    window.removeEventListener('mousemove', move);
+                    window.removeEventListener('mouseup', end);
+                }
             }
         };
     }

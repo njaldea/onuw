@@ -1,43 +1,49 @@
 <script lang='ts'>
     import { createEventDispatcher } from 'svelte';
-    import type { Piece } from '$lib/chess/Piece';
+    import type { Cell } from '$lib/chess/Cell';
 
-    export let id: number;
     export let alt: boolean;
-    export let piece: null|Piece;
-    export let targeted = true;
+    export let cell: Cell;
 
-    import action from '$lib/actions/draggable';
+    import draggableaction from '$lib/actions/draggable';
+    import cellinteropaction from '$lib/actions/cellinterop';
 
     const dispatch = createEventDispatcher();
 
+    let grabbed = false;
+
     function start()
     {
-        dispatch("piecedragstart", { id });
+        grabbed = true;
+        dispatch("piecedragstart", { cell });
     }
 
     function end(origin: HTMLDivElement, candidates: Element[])
     {
+        grabbed = false;
         const matches = candidates.filter(c => c !== origin.parentElement && c.classList.contains("cell"));
         if (matches.length > 0) {
-            matches[0].dispatchEvent(new CustomEvent("piecedragconfirm", { detail: { from: id } }));
+            matches[0].dispatchEvent(new CustomEvent("getcellid", { detail: { target: origin } }));
         } else {
             dispatch("piecedragcancel");
         }
     }
 
-    const draggable = action(start, end);
-
-    function dragconfirm(ev: CustomEvent)
-    {
-        dispatch("piecedragconfirm", { from: ev.detail.from, to: id });
-    }
+    const draggable = draggableaction(start, end);
+    const cellinterop = cellinteropaction(cell);
 </script>
 
-<div class:targeted class="cell" class:alt on:piecedragconfirm={dragconfirm}>
-    {#if piece !== null}
-        <div class="boundedpiece" use:draggable={{ piece: piece }}>
-            <div class="piece" class:team={piece.team}>{piece.role}</div>
+<div
+    class:grabbed
+    class:targeted={cell.targeted}
+    class="cell"
+    class:alt
+    use:cellinterop
+    on:piecedragconfirm={ev => dispatch("piecedragconfirm", ev.detail)}
+>
+    {#if cell.piece !== null}
+        <div class="boundedpiece" use:draggable={{ piece: cell.piece }}>
+            <div class="piece" class:team={cell.piece.team}>{cell.piece.role}</div>
         </div>
     {/if}
 </div>
@@ -49,6 +55,10 @@
         justify-content: center;
         width: 100%;
         height: 100%;
+    }
+
+    div.grabbed {
+        z-index: 1;
     }
 
     .cell {

@@ -1,11 +1,15 @@
 import type { Cell } from '$lib/chess/Cell';
 import type { Player } from '$lib/chess/Player';
 
+export type Move = {
+    next: () => void;
+    prev: () => void;
+};
+
 export abstract class IBoard {
-    abstract movePiece(from: number, to: number): boolean;
-    abstract getTeamOnCell(id: number): boolean;
+    abstract movePiece(from: Cell, to: Cell): null | Move;
     abstract clearTargetedMarkings(): void;
-    abstract setTargetedMarkings(id: number): void;
+    abstract setTargetedMarkings(cell: Cell): void;
     abstract refreshCoveredByCells(): void;
 }
 
@@ -14,24 +18,19 @@ export class Board implements IBoard {
     cells: Cell[];
     dimension: [number, number];
 
-    constructor(p: Player[], c: Cell[], [rcount, fcount]: [number, number]) {
+    constructor(p: Player[], c: Cell[], dimension: [number, number]) {
         this.players = p;
         this.cells = c;
-        this.dimension = [rcount, fcount];
+        this.dimension = dimension;
 
         this.refreshCoveredByCells();
     }
 
-    movePiece(from: number, to: number): boolean {
+    movePiece(from: Cell, to: Cell): null | Move {
         if (this.doesCellContainKing(from)) {
             return this.moveKing(from, to);
         }
         return this.movePieceStandard(from, to);
-    }
-
-    getTeamOnCell(id: number): boolean {
-        const cell = this.cells[id];
-        return cell.piece != null && cell.piece.team;
     }
 
     clearTargetedMarkings(): void {
@@ -40,19 +39,19 @@ export class Board implements IBoard {
         }
     }
 
-    *getTargetGenerator(id: number): Generator<number> {
-        if (this.doesCellContainKing(id)) {
-            yield* this.getKingTargets(id);
-        } else if (this.doesCellContainPawn(id)) {
-            yield* this.getPawnTargets(id);
+    *getTargetGenerator(cell: Cell): Generator<Cell> {
+        if (this.doesCellContainKing(cell)) {
+            yield* this.getKingTargets(cell);
+        } else if (this.doesCellContainPawn(cell)) {
+            yield* this.getPawnTargets(cell);
         } else {
-            yield* this.getDefaultTargets(id);
+            yield* this.getDefaultTargets(cell);
         }
     }
 
-    setTargetedMarkings(id: number): void {
-        for (const targetid of this.getTargetGenerator(id)) {
-            this.cells[targetid].targeted = true;
+    setTargetedMarkings(cell: Cell): void {
+        for (const targetcell of this.getTargetGenerator(cell)) {
+            targetcell.targeted = true;
         }
     }
 
@@ -61,96 +60,141 @@ export class Board implements IBoard {
         const [rcount, ccount] = this.dimension;
         for (let r = 0; r < rcount; ++r) {
             for (let c = 0; c < ccount; ++c) {
-                const cell = this.cells[r * 8 + c];
+                const cell = this.cells[r * ccount + c];
                 if (cell.piece) {
                     const moves = cell.piece.getSupportingMoves(r, c);
                     for (const [rank, file] of moves) {
-                        this.cells[rank * 8 + file].coveredby.push(cell.id);
+                        this.cells[rank * ccount + file].coveredby.push(cell.id);
                     }
                 }
             }
         }
     }
 
-    takeCell(from: number, to: number): void {
-        const fromcell = this.cells[from];
-        const tocell = this.cells[to];
-        const piece = fromcell.piece;
-        tocell.piece = piece;
-        tocell.piece.hasMoved = true;
-        fromcell.piece = null;
+    takeCell(from: Cell, to: Cell): Move {
+        const prevstate = {
+            to: to,
+            from: from,
+            topiece: to.piece,
+            frompiece: from.piece,
+            totouched: to.touched,
+            fromtouched: from.touched
+        };
+        const prev = () => {
+            prevstate.to.piece = prevstate.topiece;
+            prevstate.to.touched = prevstate.totouched;
+            prevstate.from.piece = prevstate.frompiece;
+            prevstate.from.touched = prevstate.fromtouched;
+        };
+
+        const nextstate = {
+            to: to,
+            from: from,
+            topiece: from.piece,
+            frompiece: null,
+            totouched: true,
+            fromtouched: true
+        };
+        const next = () => {
+            nextstate.to.piece = nextstate.topiece;
+            nextstate.to.touched = nextstate.totouched;
+            nextstate.from.piece = nextstate.frompiece;
+            nextstate.from.touched = nextstate.fromtouched;
+        };
+
+        return { next, prev };
     }
 
-    movePieceStandard(from: number, to: number): boolean {
-        if (this.cells[to].targeted) {
-            this.takeCell(from, to);
-            return true;
+    movePieceStandard(from: Cell, to: Cell): null | Move {
+        if (to.targeted) {
+            return this.takeCell(from, to);
         }
-        return false;
+        return null;
     }
 
-    moveKing(from: number, to: number): boolean {
-        if (this.cells[to].targeted) {
-            if (Math.abs(from - to) === 2) {
-                const delta = to > from ? +1 : -1;
-                const rookDistance = to > from ? 4 : 3;
+    moveKing(from: Cell, to: Cell): null | Move {
+        if (to.targeted) {
+            if (Math.abs(from.id - to.id) === 2) {
+                const delta = to.id > from.id ? +1 : -1;
+                const rookDistance = to.id > from.id ? 4 : 3;
 
-                const kingid = from;
-                const rookid = from + delta * rookDistance;
+                const kingid = from.id;
+                const rookid = from.id + delta * rookDistance;
 
-                const kingrow = Math.floor(kingid / this.dimension[0]);
-                const rookrow = Math.floor(rookid / this.dimension[0]);
+                const kingrow = Math.floor(kingid / this.dimension[1]);
+                const rookrow = Math.floor(rookid / this.dimension[1]);
                 if (rookrow === kingrow) {
-                    this.takeCell(kingid, kingid + delta * 2);
-                    this.takeCell(rookid, kingid + delta * 1);
-                    return true;
+                    const rookcell = this.cells[rookid];
+                    const kingcell = this.cells[kingid];
+                    if (
+                        this.players.find(
+                            (t) => t.king === kingcell.piece && t.rook === rookcell.piece
+                        ) != null
+                    ) {
+                        const kingmove = this.takeCell(kingcell, this.cells[kingid + delta * 2]);
+                        const rookmove = this.takeCell(rookcell, this.cells[kingid + delta * 1]);
+                        return {
+                            next: () => {
+                                kingmove.next();
+                                rookmove.next();
+                            },
+                            prev: () => {
+                                kingmove.prev();
+                                rookmove.prev();
+                            }
+                        };
+                    }
+                    return null;
                 }
             }
             return this.movePieceStandard(from, to);
         }
-        return false;
+        return null;
     }
 
-    doesCellContainKing(id: number): boolean {
-        const cell = this.cells[id];
+    doesCellContainKing(cell: Cell): boolean {
         return cell.piece != null && this.players.find((t) => t.king === cell.piece) != null;
     }
 
-    doesCellContainPawn(id: number): boolean {
-        const cell = this.cells[id];
-        return cell.piece != null && this.players.find((t) => t.pawns.includes(cell.piece)) != null;
+    doesCellContainPawn(cell: Cell): boolean {
+        return cell.piece != null && this.players.find((t) => t.pawn === cell.piece) != null;
     }
 
-    *getPawnTargets(id: number): Generator<number> {
-        for (const targetid of this.getDefaultTargets(id)) {
-            yield targetid;
-        }
-        const cell = this.cells[id];
-        if (!cell.piece.hasMoved) {
-            const targetid = id + (cell.piece.team ? +16 : -16);
-            if (0 <= targetid && targetid < this.cells.length) {
-                yield targetid;
+    *getPawnTargets(cell: Cell): Generator<Cell> {
+        yield* this.getDefaultTargets(cell);
+
+        if (this.dimension[0] >= 8) {
+            const row = Math.floor(cell.id / this.dimension[1]);
+            if (row === 1 || row === this.dimension[0] - 2) {
+                if (!cell.touched) {
+                    const sign = cell.piece.team ? +1 : -1;
+                    if (this.cells[cell.id + sign * this.dimension[1]].piece == null) {
+                        const targetid = cell.id + sign * this.dimension[1] * 2;
+                        if (0 <= targetid && targetid < this.cells.length) {
+                            yield this.cells[targetid];
+                        }
+                    }
+                }
             }
         }
     }
 
-    *getKingTargets(id: number): Generator<number> {
-        const cell = this.cells[id];
-        for (const targetid of this.getDefaultTargets(id)) {
-            if (!this.isCellSupportedByTeam(this.cells[targetid], !cell.piece.team)) {
-                yield targetid;
+    *getKingTargets(cell: Cell): Generator<Cell> {
+        for (const targetedcell of this.getDefaultTargets(cell)) {
+            if (!this.isCellSupportedByTeam(targetedcell, !cell.piece.team)) {
+                yield targetedcell;
             }
         }
 
-        if (!cell.piece.hasMoved) {
-            const rookcellsids = [id - 3, id + 4];
+        if (!cell.touched) {
+            const rookcellsids = [cell.id - 3, cell.id + 4];
             for (const rid of rookcellsids) {
                 const rcell = this.cells[rid];
 
                 // TODO: check if piece is rook of same team
-                if (rcell.piece && !rcell.piece.hasMoved) {
+                if (rcell.piece && !rcell.touched) {
                     let cancastle = true;
-                    const delta = rid > id ? +1 : -1;
+                    const delta = rid > cell.id ? +1 : -1;
                     for (let i = cell.id + delta; i != rid; i += delta) {
                         const nextcell = this.cells[i];
                         if (
@@ -162,17 +206,16 @@ export class Board implements IBoard {
                         }
                     }
                     if (cancastle) {
-                        yield cell.id + delta * 2;
+                        yield this.cells[cell.id + delta * 2];
                     }
                 }
             }
         }
     }
 
-    *getDefaultTargets(id: number): Generator<number> {
-        const cell = this.cells[id];
+    *getDefaultTargets(cell: Cell): Generator<Cell> {
         for (const [rank, file] of cell.piece.getPossibleMoves(...cell.position)) {
-            yield rank * this.dimension[0] + file;
+            yield this.cells[rank * this.dimension[1] + file];
         }
     }
 
