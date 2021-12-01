@@ -4,7 +4,7 @@
     import { Board, IBoard } from '$lib/chess/Board';
 
     const { dimension, cells, players } = getCells();
-    const board: IBoard = new Board(players, cells, dimension);
+    const board: IBoard = new Board(players, cells);
 </script>
 
 <div>

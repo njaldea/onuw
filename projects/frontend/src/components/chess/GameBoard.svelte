@@ -27,12 +27,14 @@
 
     function dragconfirm({ detail: { from, to } }) {
         if (teamToMove == null || (from.piece && teamToMove === from.piece.team)) {
-            const move = board.move(from, to);
-            if (move) {
-                history.push(move);
-                redoqueue.splice(0, redoqueue.length);
-                if (move.execute() && teamToMove != null) {
-                    teamToMove = !teamToMove;
+            if (to.targeted) {
+                const move = board.move(from, to);
+                if (move) {
+                    history.push(move);
+                    redoqueue.splice(0, redoqueue.length);
+                    if (move.execute() && teamToMove != null) {
+                        teamToMove = !teamToMove;
+                    }
                 }
             }
 
@@ -49,22 +51,13 @@
             board.setTargetedMarkings(cell);
         }
     }
-
-    function* boardOrder(cells: Cell[], flipped: boolean) {
-        const [start, end, delta] = flipped ? [0, cells.length, 1] : [cells.length - 1, -1, -1];
-        for (let i = start; i != end; i += delta) {
-            yield cells[i];
-        }
-    }
 </script>
 
 <div class="board" style={`--rcount: ${dimension[0]}; --ccount: ${dimension[1]};`}>
-    {#each [...boardOrder($board, flipped)] as cell (cell.id)}
+    {#each [...$board.cells().iter(!flipped)] as cell (cell.id)}
         <CellComponent
             {cell}
-            alt={dimension[1] % 2 === 0
-                ? Math.floor(cell.id / dimension[1]) % 2 ^ cell.id % 2
-                : cell.id % 2}
+            alt={dimension[1] % 2 === 0 ? cell.position[0] % 2 ^ cell.id % 2 : cell.id % 2}
             on:piecedragconfirm={dragconfirm}
             on:piecedragcancel={dragcancel}
             on:piecedragstart={dragpiecestart}

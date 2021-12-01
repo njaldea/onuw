@@ -1,33 +1,28 @@
 import type { GameDetail } from './Piece';
 import { Player } from './Player';
-import { Cell } from './Cell';
+import { Cells } from './Cell';
+import type { Cell } from './Cell';
 
 export function getCells(): {
     dimension: [number, number];
-    cells: Cell[];
+    cells: Cells;
     players: [Player, Player];
 } {
     const rcount = 8;
     const ccount = 8;
 
-    const cells: Cell[] = [];
-    for (let r = 0; r < rcount; ++r) {
-        for (let c = 0; c < ccount; ++c) {
-            cells.push(new Cell(r * ccount + c, [r, c]));
-        }
-    }
+    const cells = new Cells(8, 8);
 
     const gamedetail: GameDetail = {
         cell: {
-            inbound: (r, f) => 0 <= r && r < rcount && 0 <= f && f < ccount,
-            supporters: (r, f) =>
-                cells[r * ccount + f].coveredby.map((id) => [Math.floor(id / ccount), id % ccount]),
-            touched: (r, f) => cells[r * ccount + f].touched
+            inbound: (r, f) => cells.isValidTile(r, f),
+            supporters: (r, f) => cells.getCell(r, f)?.coveredby ?? [],
+            touched: (r, f) => cells.getCell(r, f)?.touched ?? false
         },
-        piece: (r, f) => cells[r * ccount + f].piece,
+        piece: (r, f) => cells.getCell(r, f)?.piece,
         move: (fromPos: [number, number], toPos: [number, number]) => {
-            const from = cells[fromPos[0] * ccount + fromPos[1]];
-            const to = cells[toPos[0] * ccount + toPos[1]];
+            const from = cells.getCell(...fromPos);
+            const to = cells.getCell(...toPos);
 
             const prevstate = {
                 to: to,
@@ -66,7 +61,7 @@ export function getCells(): {
         }
     };
 
-    function fill(p: Player, cells: Cell[]) {
+    function fill(p: Player, cells: Cells) {
         const order = [
             p.rook,
             p.knight,
@@ -86,15 +81,11 @@ export function getCells(): {
             p.pawn
         ];
 
-        const start = p.king.team ? 0 : cells.length - order.length;
-        const end = p.king.team ? order.length : cells.length;
-        const cc = cells.slice(start, end);
-        if (!p.king.team) {
-            cc.reverse();
-        }
+        const cellgen = cells.iter(!p.king.team);
 
         for (let index = 0; index < order.length; ++index) {
-            cc[index].piece = order[index];
+            const cell: Cell = cellgen.next().value;
+            cell.piece = order[index];
         }
     }
 

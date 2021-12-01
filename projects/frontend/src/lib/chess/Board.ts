@@ -1,4 +1,4 @@
-import type { Cell } from '$lib/chess/Cell';
+import type { Cell, Cells } from '$lib/chess/Cell';
 import type { Player } from '$lib/chess/Player';
 import type { Subscriber, Unsubscriber } from 'svelte/store';
 import type { Move } from './Piece';
@@ -7,26 +7,29 @@ export abstract class IBoard {
     abstract move(from: Cell, to: Cell): null | Move;
     abstract clearTargetedMarkings(): void;
     abstract setTargetedMarkings(cell: Cell): void;
-    abstract subscribe(cb: Subscriber<Cell[]>): () => void;
+    abstract subscribe(cb: Subscriber<IBoard>): () => void;
+    abstract cells(): Cells;
 }
 
 export class Board implements IBoard {
     players: Player[];
-    cells: Cell[];
-    dimension: [number, number];
-    subscribers: Subscriber<Cell[]>[];
+    icells: Cells;
+    subscribers: Subscriber<IBoard>[];
 
-    constructor(p: Player[], c: Cell[], dimension: [number, number]) {
+    constructor(p: Player[], c: Cells) {
         this.players = p;
-        this.cells = c;
-        this.dimension = dimension;
+        this.icells = c;
         this.subscribers = [];
 
         this.refreshCoveredByCells();
     }
 
-    subscribe(cb: (cells: Cell[]) => void): Unsubscriber {
-        cb(this.cells);
+    cells(): Cells {
+        return this.icells;
+    }
+
+    subscribe(cb: (self: IBoard) => void): Unsubscriber {
+        cb(this);
         this.subscribers.push(cb);
         return () => {
             const idx = this.subscribers.indexOf(cb);
@@ -38,35 +41,33 @@ export class Board implements IBoard {
 
     notify(): void {
         for (const cb of this.subscribers) {
-            cb(this.cells);
+            cb(this);
         }
     }
 
     move(from: Cell, to: Cell): null | Move {
-        if (to.targeted) {
-            const move = from.piece.move(from.position, to.position);
-            if (move) {
-                return {
-                    execute: () => {
-                        const ret = move.execute();
-                        this.refreshCoveredByCells();
-                        this.notify();
-                        return ret;
-                    },
-                    revert: () => {
-                        const ret = move.revert();
-                        this.refreshCoveredByCells();
-                        this.notify();
-                        return ret;
-                    }
-                };
-            }
+        const move = from.piece.move(from.position, to.position);
+        if (move) {
+            return {
+                execute: () => {
+                    const ret = move.execute();
+                    this.refreshCoveredByCells();
+                    this.notify();
+                    return ret;
+                },
+                revert: () => {
+                    const ret = move.revert();
+                    this.refreshCoveredByCells();
+                    this.notify();
+                    return ret;
+                }
+            };
         }
         return null;
     }
 
     clearTargetedMarkings(): void {
-        for (const cell of this.cells) {
+        for (const cell of this.icells.iter()) {
             cell.targeted = false;
         }
         this.notify();
@@ -74,17 +75,23 @@ export class Board implements IBoard {
 
     setTargetedMarkings(cell: Cell): void {
         for (const [r, f] of cell.piece.getAttackingMoves(...cell.position)) {
-            this.cells[r * this.dimension[1] + f].targeted = true;
+            const c = this.icells.getCell(r, f);
+            if (c) {
+                c.targeted = true;
+            }
         }
         this.notify();
     }
 
     refreshCoveredByCells(): void {
-        this.cells.forEach((cell) => (cell.coveredby = []));
-        this.cells.forEach((cell) => {
+        [...this.icells.iter()].forEach((cell) => (cell.coveredby = []));
+        [...this.icells.iter()].forEach((cell) => {
             if (cell.piece != null) {
                 for (const [rank, file] of cell.piece.getSupportingMoves(...cell.position)) {
-                    this.cells[rank * this.dimension[1] + file].coveredby.push(cell.id);
+                    const c = this.icells.getCell(rank, file);
+                    if (c) {
+                        c.coveredby.push(cell.position);
+                    }
                 }
             }
         });

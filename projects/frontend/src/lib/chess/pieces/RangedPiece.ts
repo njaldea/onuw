@@ -48,11 +48,11 @@ export function* getSupportingMoves(
     limit: null | number = null
 ): Generator<[number, number]> {
     for (const move of getMoves(self, r, f, rd, fd, limit)) {
-        const piece = self.detail.piece(move[0], move[1]);
+        const piece = self.detail.piece(...move);
         if (piece == null || piece.team === self.team) {
             yield move;
         }
-        if (piece != null && piece.team !== self.team && piece.role !== 'K') {
+        if (piece != null && piece.role !== 'K') {
             break;
         }
     }
