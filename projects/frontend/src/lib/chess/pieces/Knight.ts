@@ -1,20 +1,24 @@
-import type { PieceGetter, CellBoundCheck } from '$lib/chess/Piece';
+import type { GameDetail, Move } from '$lib/chess/Piece';
 import { Piece } from '$lib/chess/Piece';
 
 export default class Knight extends Piece {
-    constructor(team: boolean, isCellInBound: CellBoundCheck, pieceGetter: PieceGetter) {
-        super('N', team, isCellInBound, pieceGetter);
+    constructor(team: boolean, detail: GameDetail) {
+        super('N', team, detail);
     }
 
-    *getPossibleMoves(r: number, f: number): Generator<[number, number]> {
-        yield* this.moves(r, f, false);
+    *getAttackingMoves(r: number, f: number): Generator<[number, number]> {
+        yield* this.movesCollect(r, f, (piece: Piece) => piece.team !== this.team);
     }
 
     *getSupportingMoves(r: number, f: number): Generator<[number, number]> {
-        yield* this.moves(r, f, true);
+        yield* this.movesCollect(r, f, (piece: Piece) => piece.team === this.team);
     }
 
-    *moves(r: number, f: number, supporting: boolean): Generator<[number, number]> {
+    *movesCollect(
+        r: number,
+        f: number,
+        predicate: (piece: Piece) => boolean
+    ): Generator<[number, number]> {
         const deltas = [-2, -1, 1, 2];
         for (const rd of deltas) {
             for (const fd of deltas) {
@@ -23,17 +27,17 @@ export default class Knight extends Piece {
                 }
 
                 const cell: [number, number] = [r + rd, f + fd];
-                if (this.isCellInBound(...cell)) {
-                    if (supporting) {
+                if (this.detail.cell.inbound(...cell)) {
+                    const otherpiece = this.detail.piece(...cell);
+                    if (otherpiece == null || predicate(otherpiece)) {
                         yield cell;
-                    } else {
-                        const otherpiece = this.pieceGetter(...cell);
-                        if (otherpiece == null || otherpiece.team !== this.team) {
-                            yield cell;
-                        }
                     }
                 }
             }
         }
+    }
+
+    move(from: [number, number], to: [number, number]): Move {
+        return this.detail.move(from, to);
     }
 }

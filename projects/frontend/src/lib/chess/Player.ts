@@ -1,4 +1,4 @@
-import type { CellBoundCheck, Piece, PieceGetter } from '$lib/chess/Piece';
+import type { GameDetail, Piece } from '$lib/chess/Piece';
 
 import Pawn from './pieces/Pawn';
 import Knight from './pieces/Knight';
@@ -15,7 +15,7 @@ export class Player {
     rook: Piece;
     pawn: Piece;
 
-    constructor(team: boolean, isCellInBound: CellBoundCheck, pieceGetter: PieceGetter) {
+    constructor(team: boolean, gamedetail: GameDetail) {
         // assumes white always at rank 0
         const transform = (
             r: number,
@@ -26,11 +26,11 @@ export class Player {
             return this.king.team ? [r + rdelta, f + fdelta] : [r - rdelta, f - fdelta];
         };
 
-        this.king = new King(team, isCellInBound, pieceGetter);
-        this.queen = new Queen(team, isCellInBound, pieceGetter);
-        this.bishop = new Bishop(team, isCellInBound, pieceGetter);
-        this.knight = new Knight(team, isCellInBound, pieceGetter);
-        this.rook = new Rook(team, isCellInBound, pieceGetter);
-        this.pawn = new Pawn(team, isCellInBound, pieceGetter, transform);
+        this.king = new King(team, gamedetail);
+        this.queen = new Queen(team, gamedetail);
+        this.bishop = new Bishop(team, gamedetail);
+        this.knight = new Knight(team, gamedetail);
+        this.rook = new Rook(team, gamedetail);
+        this.pawn = new Pawn(team, gamedetail, transform);
     }
 }

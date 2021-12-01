@@ -1,4 +1,4 @@
-import type { CellBoundCheck, PieceGetter } from './Piece';
+import type { GameDetail } from './Piece';
 import { Player } from './Player';
 import { Cell } from './Cell';
 
@@ -17,15 +17,53 @@ export function getCells(): {
         }
     }
 
-    const pieceGetter: PieceGetter = (r: number, f: number) => {
-        if (r < rcount && f < ccount) {
-            return cells[r * ccount + f].piece;
-        }
-        return null;
-    };
+    const gamedetail: GameDetail = {
+        cell: {
+            inbound: (r, f) => 0 <= r && r < rcount && 0 <= f && f < ccount,
+            supporters: (r, f) =>
+                cells[r * ccount + f].coveredby.map((id) => [Math.floor(id / ccount), id % ccount]),
+            touched: (r, f) => cells[r * ccount + f].touched
+        },
+        piece: (r, f) => cells[r * ccount + f].piece,
+        move: (fromPos: [number, number], toPos: [number, number]) => {
+            const from = cells[fromPos[0] * ccount + fromPos[1]];
+            const to = cells[toPos[0] * ccount + toPos[1]];
 
-    const isCellInBound: CellBoundCheck = (r: number, f: number) => {
-        return 0 <= r && r < rcount && 0 <= f && f < ccount;
+            const prevstate = {
+                to: to,
+                from: from,
+                topiece: to.piece,
+                frompiece: from.piece,
+                totouched: to.touched,
+                fromtouched: from.touched
+            };
+
+            const nextstate = {
+                to: to,
+                from: from,
+                topiece: from.piece,
+                frompiece: null,
+                totouched: true,
+                fromtouched: true
+            };
+
+            return {
+                revert: () => {
+                    prevstate.to.piece = prevstate.topiece;
+                    prevstate.to.touched = prevstate.totouched;
+                    prevstate.from.piece = prevstate.frompiece;
+                    prevstate.from.touched = prevstate.fromtouched;
+                    return true;
+                },
+                execute: () => {
+                    nextstate.to.piece = nextstate.topiece;
+                    nextstate.to.touched = nextstate.totouched;
+                    nextstate.from.piece = nextstate.frompiece;
+                    nextstate.from.touched = nextstate.fromtouched;
+                    return true;
+                }
+            };
+        }
     };
 
     function fill(p: Player, cells: Cell[]) {
@@ -60,10 +98,10 @@ export function getCells(): {
         }
     }
 
-    const p1 = new Player(true, isCellInBound, pieceGetter);
+    const p1 = new Player(true, gamedetail);
     fill(p1, cells);
 
-    const p2 = new Player(false, isCellInBound, pieceGetter);
+    const p2 = new Player(false, gamedetail);
     fill(p2, cells);
 
     return { dimension: [rcount, ccount], cells, players: [p1, p2] };

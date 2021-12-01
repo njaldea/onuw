@@ -1,7 +1,8 @@
 <script lang="ts">
     import CellComponent from '$components/chess/Cell.svelte';
-    import type { IBoard, Move } from '$lib/chess/Board';
+    import type { IBoard } from '$lib/chess/Board';
     import type { Cell } from '$lib/chess/Cell';
+    import type { Move } from '$lib/chess/Piece';
 
     export let dimension: [number, number];
     export let flipped: boolean;
@@ -14,13 +15,11 @@
     const redoqueue: Move[] = [];
 
     function move(q1: Move[], q2: Move[], method: (m: Move) => boolean) {
-        if (q1.length > 0)
-        {
+        if (q1.length > 0) {
             const move = q1.pop();
             q2.push(move);
 
-            if (method(move) && teamToMove != null)
-            {
+            if (method(move) && teamToMove != null) {
                 teamToMove = !teamToMove;
             }
         }
