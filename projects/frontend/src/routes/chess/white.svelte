@@ -10,11 +10,8 @@
     const cells = new Cells(8, 8);
     const gamedetail: Detail = new BasicGame(cells);
 
-    const players = [
-        new Player(true, gamedetail),
-        new Player(false, gamedetail)
-    ];
-    players.forEach(p => fill(p, cells));
+    const players = [new Player(true, gamedetail), new Player(false, gamedetail)];
+    players.forEach((p) => fill(p, cells));
 
     const board: IBoard = new Board(players, cells);
 </script>

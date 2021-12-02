@@ -54,7 +54,7 @@
 </script>
 
 <div class="board" style={`--rcount: ${dimension[0]}; --ccount: ${dimension[1]};`}>
-    {#each [...$board.cells(!flipped)] as cell (cell.id)}
+    {#each [...$board.cells(!flipped)] as cell (cell)}
         <CellComponent
             {cell}
             alt={dimension[1] % 2 === 0 ? cell.position[0] % 2 ^ cell.id % 2 : cell.id % 2}

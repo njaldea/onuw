@@ -7,8 +7,10 @@ export abstract class IBoard {
     abstract move(from: Cell, to: Cell): null | Move;
     abstract clearTargetedMarkings(): void;
     abstract setTargetedMarkings(cell: Cell): void;
-    abstract subscribe(cb: Subscriber<IBoard>): () => void;
     abstract cells(reverse: boolean): Generator<Cell>;
+
+    abstract subscribe(cb: Subscriber<IBoard>): () => void;
+    abstract notify(): void;
 }
 
 export class Board implements IBoard {

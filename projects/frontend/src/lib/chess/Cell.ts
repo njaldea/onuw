@@ -50,14 +50,11 @@ export class Cells {
     }
 
     *iter(reversed = false): Generator<Cell> {
-        if (reversed) {
-            for (const cell of this.cells.slice(0, this.cells.length).reverse()) {
-                yield cell;
-            }
-        } else {
-            for (const cell of this.cells) {
-                yield cell;
-            }
+        const [start, end, delta] = reversed
+            ? [this.cells.length - 1, -1, -1]
+            : [0, this.cells.length, 1];
+        for (let i = start; i != end; i += delta) {
+            yield this.cells[i];
         }
     }
 

@@ -6,20 +6,17 @@
     import { BasicGame } from '$lib/chess/game/Basic';
     import type { Detail } from '$lib/chess/game/Detail';
 
-    const cells = new Cells(8, 8);
+    let rcount = 2;
+    let ccount = 2;
+
+    const cells = new Cells(2, 2);
     const gamedetail: Detail = new BasicGame(cells);
 
-    let rcount = 8;
-    let ccount = 8;
+    const players = [new Player(true, gamedetail), new Player(false, gamedetail)];
 
-    const players = [
-        new Player(true, gamedetail),
-        new Player(false, gamedetail)
-    ];
+    const board = new Board(players, cells);
 
-    const board: IBoard = new Board(players, cells);
-
-    const factory: Cell[] = []
+    const factory: Cell[] = [];
     function createTemplateCell() {
         const cell = new Cell(factory.length, [factory.length, 0]);
         factory.push(cell);
@@ -33,41 +30,21 @@
         createTemplateCell().piece = player.pawn;
     }
 
-    let rankcreator = 0;
-    let tilecreator = 0;
-
-    function updatecreator(r: number, f: number) {
-        if (r < rankcreator) {
-            rankcreator = r;
-        }
-
-        if (f < tilecreator) {
-            tilecreator = f;
-        }
+    function updatecreator(r: number, f: number, c: Cells) {
+        c.reset(r, f);
+        board.icells = c;
+        board.notify();
     }
-    $: updatecreator(rcount, ccount);
+    $: updatecreator(rcount, ccount, cells);
 </script>
 
 <div class="root">
     <div class="board">
-        <EditorBoard
-            flipped={false}
-            {factory}
-            {board}
-            dimension={[rcount, ccount]}
-        />
+        <EditorBoard flipped={false} {factory} {board} dimension={[rcount, ccount]} />
     </div>
     <div class="panel">
         <label><input type="number" min={0} bind:value={rcount} /><span>max rank</span></label>
         <label><input type="number" min={0} bind:value={ccount} /><span>max file</span></label>
-        <label
-            ><input type="number" min={0} max={rcount} bind:value={rankcreator} /><span>rank</span
-            ></label
-        >
-        <label
-            ><input type="number" min={0} max={ccount} bind:value={tilecreator} /><span>file</span
-            ></label
-        >
     </div>
 </div>
 

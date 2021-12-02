@@ -19,14 +19,15 @@
 
     function end(origin: HTMLDivElement, candidates: Element[]) {
         grabbed = false;
-        const matches = candidates.filter(
-            (c) => c !== origin.parentElement && c.classList.contains('cell')
-        );
-        if (matches.length > 0) {
-            matches[0].dispatchEvent(new CustomEvent('getcellid', { detail: { target: origin } }));
-        } else {
-            dispatch('piecedragcancel');
+        for (const candidate of candidates) {
+            if (candidate !== origin.parentElement && candidate.classList.contains('cell')) {
+                candidate.dispatchEvent(
+                    new CustomEvent('getcellid', { detail: { target: origin.parentElement } })
+                );
+                return;
+            }
         }
+        dispatch('piecedragcancel');
     }
 
     const draggable = draggableaction(start, end);
@@ -39,7 +40,7 @@
     class="cell"
     class:alt
     use:cellinterop
-    on:piecedragconfirm={(ev) => dispatch('piecedragconfirm', ev.detail)}
+    on:piecedragconfirm
 >
     {#if cell.piece !== null}
         <div class="boundedpiece" use:draggable={{ piece: cell.piece }}>

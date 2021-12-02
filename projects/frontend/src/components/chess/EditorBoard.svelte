@@ -21,21 +21,19 @@
 
     function dragconfirm({ detail: { from, to } }) {
         if (cells.includes(from) && cells.includes(to)) {
-            to.piece = from.piece;
-            from.piece = null;
-            board.notify();
+            board.move(from, to).execute();
         }
     }
 </script>
 
 <div class="root">
     <div class="template" style={`--rcount: ${factory.length};`}>
-        {#each factory as cell (cell.id)}
+        {#each factory as cell (cell)}
             <CellComponent alt={false} {cell} on:piecedragconfirm={dragconfirmcopy} />
         {/each}
     </div>
     <div class="board" style={`--rcount: ${dimension[0]}; --ccount: ${dimension[1]};`}>
-        {#each [...$board.cells(!flipped)] as cell (cell.id)}
+        {#each [...$board.cells(!flipped)] as cell (cell)}
             <CellComponent
                 {cell}
                 alt={dimension[1] % 2 === 0

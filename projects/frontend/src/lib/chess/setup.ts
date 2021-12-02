@@ -1,7 +1,7 @@
 import type { Cell, Cells } from './Cell';
 import type { Player } from './Player';
 
-export function fill(p: Player, cells: Cells) {
+export function fill(p: Player, cells: Cells): void {
     const order = [
         p.rook,
         p.knight,
