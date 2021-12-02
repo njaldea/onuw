@@ -1,37 +1,37 @@
 <script lang="ts">
     import EditorBoard from '$components/chess/EditorBoard.svelte';
-    import type { CellBoundCheck, PieceGetter } from '$lib/chess/Piece';
+    import { Cell, Cells } from '$lib/chess/Cell';
     import { Player } from '$lib/chess/Player';
-    import { Cell } from '$lib/chess/Cell';
+    import { Board, IBoard } from '$lib/chess/Board';
+    import { BasicGame } from '$lib/chess/game/Basic';
+    import type { Detail } from '$lib/chess/game/Detail';
+
+    const cells = new Cells(8, 8);
+    const gamedetail: Detail = new BasicGame(cells);
 
     let rcount = 8;
-    let ccount = 4;
+    let ccount = 8;
 
-    function populatecells(rr: number, cc: number) {
-        let cells: Cell[] = [];
-        for (let r = 0; r < rr; ++r) {
-            for (let c = 0; c < cc; ++c) {
-                cells.push(new Cell(r * cc + c, [r, c]));
-            }
-        }
-        return cells;
+    const players = [
+        new Player(true, gamedetail),
+        new Player(false, gamedetail)
+    ];
+
+    const board: IBoard = new Board(players, cells);
+
+    const factory: Cell[] = []
+    function createTemplateCell() {
+        const cell = new Cell(factory.length, [factory.length, 0]);
+        factory.push(cell);
+        return cell;
     }
-
-    $: cells = populatecells(rcount, ccount);
-
-    const pieceGetter: PieceGetter = (r: number, f: number) => {
-        if (r < rcount && f < ccount) {
-            return cells[r * ccount + f].piece;
-        }
-        return null;
-    };
-
-    const isCellInBound: CellBoundCheck = (r: number, f: number) => {
-        return 0 <= r && r < rcount && 0 <= f && f < ccount;
-    };
-
-    const player1 = new Player(true, isCellInBound, pieceGetter);
-    const player2 = new Player(false, isCellInBound, pieceGetter);
+    for (const player of players) {
+        createTemplateCell().piece = player.queen;
+        createTemplateCell().piece = player.bishop;
+        createTemplateCell().piece = player.knight;
+        createTemplateCell().piece = player.rook;
+        createTemplateCell().piece = player.pawn;
+    }
 
     let rankcreator = 0;
     let tilecreator = 0;
@@ -52,8 +52,8 @@
     <div class="board">
         <EditorBoard
             flipped={false}
-            players={[player1, player2]}
-            {cells}
+            {factory}
+            {board}
             dimension={[rcount, ccount]}
         />
     </div>

@@ -24,6 +24,10 @@ export class Cells {
     ccount: number;
 
     constructor(rcount: number, ccount: number) {
+        this.reset(rcount, ccount);
+    }
+
+    reset(rcount: number, ccount: number): void {
         this.cells = [];
         this.rcount = rcount;
         this.ccount = ccount;
