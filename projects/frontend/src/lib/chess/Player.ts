@@ -1,4 +1,4 @@
-import type { GameDetail, Piece } from '$lib/chess/Piece';
+import type { Piece } from '$lib/chess/Piece';
 
 import Pawn from './pieces/Pawn';
 import Knight from './pieces/Knight';
@@ -6,6 +6,7 @@ import Rook from './pieces/Rook';
 import Bishop from './pieces/Bishop';
 import Queen from './pieces/Queen';
 import King from './pieces/King';
+import type { Detail } from './game/Detail';
 
 export class Player {
     king: Piece;
@@ -15,7 +16,7 @@ export class Player {
     rook: Piece;
     pawn: Piece;
 
-    constructor(team: boolean, gamedetail: GameDetail) {
+    constructor(team: boolean, gamedetail: Detail) {
         // assumes white always at rank 0
         const transform = (
             r: number,

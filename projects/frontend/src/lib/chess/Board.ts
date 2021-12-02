@@ -1,14 +1,14 @@
 import type { Cell, Cells } from '$lib/chess/Cell';
 import type { Player } from '$lib/chess/Player';
 import type { Subscriber, Unsubscriber } from 'svelte/store';
-import type { Move } from './Piece';
+import type { Move } from './game/Detail';
 
 export abstract class IBoard {
     abstract move(from: Cell, to: Cell): null | Move;
     abstract clearTargetedMarkings(): void;
     abstract setTargetedMarkings(cell: Cell): void;
     abstract subscribe(cb: Subscriber<IBoard>): () => void;
-    abstract cells(): Cells;
+    abstract cells(reverse: boolean): Generator<Cell>;
 }
 
 export class Board implements IBoard {
@@ -21,11 +21,11 @@ export class Board implements IBoard {
         this.icells = c;
         this.subscribers = [];
 
-        this.refreshCoveredByCells();
+        this.icells.resetCellSupport();
     }
 
-    cells(): Cells {
-        return this.icells;
+    *cells(reverse: boolean): Generator<Cell> {
+        yield* this.icells.iter(reverse);
     }
 
     subscribe(cb: (self: IBoard) => void): Unsubscriber {
@@ -51,13 +51,13 @@ export class Board implements IBoard {
             return {
                 execute: () => {
                     const ret = move.execute();
-                    this.refreshCoveredByCells();
+                    this.icells.resetCellSupport();
                     this.notify();
                     return ret;
                 },
                 revert: () => {
                     const ret = move.revert();
-                    this.refreshCoveredByCells();
+                    this.icells.resetCellSupport();
                     this.notify();
                     return ret;
                 }
@@ -81,19 +81,5 @@ export class Board implements IBoard {
             }
         }
         this.notify();
-    }
-
-    refreshCoveredByCells(): void {
-        [...this.icells.iter()].forEach((cell) => (cell.coveredby = []));
-        [...this.icells.iter()].forEach((cell) => {
-            if (cell.piece != null) {
-                for (const [rank, file] of cell.piece.getSupportingMoves(...cell.position)) {
-                    const c = this.icells.getCell(rank, file);
-                    if (c) {
-                        c.coveredby.push(cell.position);
-                    }
-                }
-            }
-        });
     }
 }

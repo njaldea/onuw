@@ -1,8 +1,8 @@
-import type { GameDetail, Move } from '$lib/chess/Piece';
+import type { Detail, Move } from '$lib/chess/game/Detail';
 import { Piece } from '$lib/chess/Piece';
 
 export default class Knight extends Piece {
-    constructor(team: boolean, detail: GameDetail) {
+    constructor(team: boolean, detail: Detail) {
         super('N', team, detail);
     }
 
@@ -27,7 +27,7 @@ export default class Knight extends Piece {
                 }
 
                 const cell: [number, number] = [r + rd, f + fd];
-                if (this.detail.cell.inbound(...cell)) {
+                if (this.detail.cell_inbound(...cell)) {
                     const otherpiece = this.detail.piece(...cell);
                     if (otherpiece == null || predicate(otherpiece)) {
                         yield cell;

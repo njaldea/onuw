@@ -1,14 +1,14 @@
-import type { GameDetail, Move } from '$lib/chess/Piece';
+import type { Detail, Move } from '$lib/chess/game/Detail';
 import { Piece } from '$lib/chess/Piece';
 
 export default class King extends Piece {
-    constructor(team: boolean, detail: GameDetail) {
+    constructor(team: boolean, detail: Detail) {
         super('K', team, detail);
     }
 
     *getAttackingMoves(r: number, f: number): Generator<[number, number]> {
         for (const m of this.movesCollect(r, f)) {
-            if (!this.detail.cell.inbound(...m)) {
+            if (!this.detail.cell_inbound(...m)) {
                 continue;
             }
             const piece = this.detail.piece(...m);
@@ -17,7 +17,7 @@ export default class King extends Piece {
             }
 
             let include = true;
-            for (const supporter of this.detail.cell.supporters(...m)) {
+            for (const supporter of this.detail.cell_supporters(...m)) {
                 const supportingPiece = this.detail.piece(...supporter);
                 if (
                     supportingPiece &&
@@ -34,7 +34,7 @@ export default class King extends Piece {
             yield m;
         }
 
-        if (!this.detail.cell.touched(r, f)) {
+        if (!this.detail.cell_touched(r, f)) {
             // TODO: if checked, we can't castle
             yield* this.getCastleMoves(r, f, 0, -1);
             yield* this.getCastleMoves(r, f, 7, +1);
@@ -47,13 +47,13 @@ export default class King extends Piece {
         rookfile: number,
         delta: number
     ): Generator<[number, number]> {
-        if (this.detail.cell.inbound(r, f) && !this.detail.cell.touched(r, f)) {
+        if (this.detail.cell_inbound(r, f) && !this.detail.cell_touched(r, f)) {
             for (let i = f + delta; i != rookfile; i += delta) {
                 if (this.detail.piece(r, i)) {
                     return;
                 }
                 if (i !== f + delta * 3) {
-                    for (const supporter of this.detail.cell.supporters(r, i)) {
+                    for (const supporter of this.detail.cell_supporters(r, i)) {
                         const supportingPiece = this.detail.piece(...supporter);
                         if (supportingPiece && supportingPiece.team != this.team) {
                             return;
@@ -67,7 +67,7 @@ export default class King extends Piece {
 
     *getSupportingMoves(r: number, f: number): Generator<[number, number]> {
         for (const m of this.movesCollect(r, f)) {
-            if (!this.detail.cell.inbound(...m)) {
+            if (!this.detail.cell_inbound(...m)) {
                 continue;
             }
             const piece = this.detail.piece(...m);

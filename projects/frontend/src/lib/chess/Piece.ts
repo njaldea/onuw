@@ -9,29 +9,10 @@
  * and to generally isolate the responsibility if Piece from Cell.
  */
 
-type CellTouched = (r: number, f: number) => boolean;
-type CellBoundCheck = (r: number, f: number) => boolean;
-type CellSupporters = (r: number, f: number) => [number, number][];
-type PieceGetter = (r: number, f: number) => Piece;
-
-export type Move = {
-    execute: () => boolean;
-    revert: () => boolean;
-};
-type MoveCreator = (from: [number, number], to: [number, number]) => Move;
-
-export type GameDetail = {
-    cell: {
-        touched: CellTouched;
-        inbound: CellBoundCheck;
-        supporters: CellSupporters;
-    };
-    piece: PieceGetter;
-    move: MoveCreator;
-};
+import type { Detail, Move } from './game/Detail';
 
 export abstract class Piece {
-    constructor(r: string, t: boolean, detail: GameDetail) {
+    constructor(r: string, t: boolean, detail: Detail) {
         this.role = r;
         this.team = t;
         this.detail = detail;
@@ -39,7 +20,7 @@ export abstract class Piece {
 
     role: string;
     team: boolean;
-    detail: GameDetail;
+    detail: Detail;
 
     abstract getAttackingMoves(r: number, f: number): Generator<[number, number]>;
     abstract getSupportingMoves(r: number, f: number): Generator<[number, number]>;

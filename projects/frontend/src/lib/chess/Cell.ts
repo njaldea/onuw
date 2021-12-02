@@ -34,18 +34,18 @@ export class Cells {
         }
     }
 
-    getCell(r: number, f: number) {
+    getCell(r: number, f: number): null | Cell {
         if (this.isValidTile(r, f)) {
             return this.cells[r * this.ccount + f];
         }
         return null;
     }
 
-    isValidTile(r: number, f: number) {
+    isValidTile(r: number, f: number): boolean {
         return 0 <= r && r < this.rcount && 0 <= f && f < this.ccount;
     }
 
-    *iter(reversed: boolean = false): Generator<Cell> {
+    *iter(reversed = false): Generator<Cell> {
         if (reversed) {
             for (const cell of this.cells.slice(0, this.cells.length).reverse()) {
                 yield cell;
@@ -55,5 +55,19 @@ export class Cells {
                 yield cell;
             }
         }
+    }
+
+    resetCellSupport(): void {
+        [...this.iter()].forEach((cell) => (cell.coveredby = []));
+        [...this.iter()].forEach((cell) => {
+            if (cell.piece != null) {
+                for (const [rank, file] of cell.piece.getSupportingMoves(...cell.position)) {
+                    const c = this.getCell(rank, file);
+                    if (c) {
+                        c.coveredby.push(cell.position);
+                    }
+                }
+            }
+        });
     }
 }

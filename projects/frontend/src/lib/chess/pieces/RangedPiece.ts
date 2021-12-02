@@ -1,4 +1,4 @@
-import type { GameDetail, Move } from '$lib/chess/Piece';
+import type { Detail, Move } from '$lib/chess/game/Detail';
 import { Piece } from '$lib/chess/Piece';
 
 function* getMoves(
@@ -12,7 +12,7 @@ function* getMoves(
     for (let i = 0; limit == null || i < limit; ++i) {
         const rank = r + rd * (i + 1);
         const file = f + fd * (i + 1);
-        if (self.detail.cell.inbound(rank, file)) {
+        if (self.detail.cell_inbound(rank, file)) {
             yield [rank, file];
         } else {
             break;
@@ -60,7 +60,7 @@ export function* getSupportingMoves(
 
 export default class RangedPiece extends Piece {
     directions: [number, number][];
-    constructor(role: string, team: boolean, detail: GameDetail, directions: [number, number][]) {
+    constructor(role: string, team: boolean, detail: Detail, directions: [number, number][]) {
         super(role, team, detail);
         this.directions = directions;
     }
