@@ -5,12 +5,12 @@
     "main": "index.js",
     "scripts": {
         "frontend:build": "npm run build -w projects/frontend",
-        "chatter:dev": "npm run dev -w projects/chatters",
         "frontend:dev": "npm run dev -w projects/frontend",
+        "chatter:dev": "npm run dev -w projects/chatters",
         "dev": "run-p frontend:dev chatter:dev",
         "build": "npm run frontend:build",
-        "heroku:publish": "git subtree push --prefix projects/chatters heroku master",
         "lint": "eslint --ignore-path .gitignore .",
+        "heroku:publish": "git subtree push --prefix projects/chatters https://git.heroku.com/onuw-chatter.git master",
         "format": "prettier --ignore-path .gitignore --ignore-path projects/frontend/.gitignore --write --plugin-search-dir=. ."
     },
     "repository": {
@@ -34,5 +34,8 @@
         "eslint": "^8.3.0",
         "eslint-config-prettier": "^8.3.0",
         "eslint-plugin-svelte3": "^3.2.1"
+    },
+    "engines": {
+        "node": "16.x"
     }
 }
