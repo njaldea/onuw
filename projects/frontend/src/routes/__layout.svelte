@@ -22,7 +22,7 @@
 {/if}
 
 <style>
-    div > div {
+    .root > div {
         width: 85%;
 
         margin: auto;

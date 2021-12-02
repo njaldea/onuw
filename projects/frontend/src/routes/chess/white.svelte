@@ -17,7 +17,7 @@
 </script>
 
 <div>
-    <GameBoard flipped={false} {board} {cells} dimension={[cells.rcount, cells.ccount]} />
+    <GameBoard flipped={false} {board} dimension={[cells.rcount, cells.ccount]} />
 </div>
 
 <style>

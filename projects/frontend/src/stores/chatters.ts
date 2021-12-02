@@ -1,4 +1,4 @@
-import { writable } from 'svelte/store';
+import { Subscriber, writable } from 'svelte/store';
 import wschatters from '$lib/ws-chatters';
 
 const chatters = writable<string[]>([]);
@@ -8,7 +8,7 @@ wschatters.on(1, (arg) => {
 });
 
 export default {
-    subscribe: (cb) => chatters.subscribe(cb),
+    subscribe: (cb: Subscriber<string[]>) => chatters.subscribe(cb),
     add: (chatter: string) => {
         wschatters.send({ type: 2, chatter });
     },

@@ -2,7 +2,7 @@
     import EditorBoard from '$components/chess/EditorBoard.svelte';
     import { Cell, Cells } from '$lib/chess/Cell';
     import { Player } from '$lib/chess/Player';
-    import { Board, IBoard } from '$lib/chess/Board';
+    import { Board } from '$lib/chess/Board';
     import { BasicGame } from '$lib/chess/game/Basic';
     import type { Detail } from '$lib/chess/game/Detail';
 
