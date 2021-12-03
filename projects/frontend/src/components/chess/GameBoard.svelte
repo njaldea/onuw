@@ -14,12 +14,31 @@
     const history: Move[] = [];
     const redoqueue: Move[] = [];
 
-    function move(q1: Move[], q2: Move[], method: (m: Move) => boolean) {
-        if (q1.length > 0) {
-            const move = q1.pop();
-            q2.push(move);
+    function undo() {
+        if (history.length > 0) {
+            const move = history.pop();
+            redoqueue.push(move);
 
-            if (method(move) && teamToMove != null) {
+            if (move.revert() && teamToMove != null) {
+                teamToMove = !teamToMove;
+            }
+
+            if (history.length > 0) {
+                history[history.length - 1].revertprenext();
+            }
+        }
+    }
+
+    function redo() {
+        if (redoqueue.length > 0) {
+            if (history.length > 0) {
+                history[history.length - 1].prenext();
+            }
+
+            const move = redoqueue.pop();
+            history.push(move);
+
+            if (move.execute() && teamToMove != null) {
                 teamToMove = !teamToMove;
             }
         }
@@ -30,11 +49,9 @@
             if (to.targeted) {
                 const move = board.move(from, to);
                 if (move) {
-                    history.push(move);
                     redoqueue.splice(0, redoqueue.length);
-                    if (move.execute() && teamToMove != null) {
-                        teamToMove = !teamToMove;
-                    }
+                    redoqueue.push(move);
+                    redo();
                 }
             }
 
@@ -64,8 +81,8 @@
         />
     {/each}
 </div>
-<button on:click={() => move(history, redoqueue, (m) => m.revert())}>Undo</button>
-<button on:click={() => move(redoqueue, history, (m) => m.execute())}>Redo</button>
+<button on:click={undo}>Undo</button>
+<button on:click={redo}>Redo</button>
 
 <style>
     .board {

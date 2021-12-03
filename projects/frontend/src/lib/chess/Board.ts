@@ -62,7 +62,9 @@ export class Board implements IBoard {
                     this.icells.resetCellSupport();
                     this.notify();
                     return ret;
-                }
+                },
+                prenext: () => move.prenext(),
+                revertprenext: () => move.revertprenext()
             };
         }
         return null;

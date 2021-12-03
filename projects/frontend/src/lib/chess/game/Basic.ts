@@ -10,6 +10,10 @@ export class BasicGame extends Detail {
         this.cells = cells;
     }
 
+    cell_marks(r: number, f: number): Record<string, unknown> {
+        return { ...(this.cells.getCell(r, f)?.marks ?? {}) };
+    }
+
     cell_inbound(r: number, f: number): boolean {
         return this.cells.isValidTile(r, f);
     }
@@ -26,7 +30,38 @@ export class BasicGame extends Detail {
         return this.cells.getCell(r, f)?.piece ?? null;
     }
 
-    move(from: [number, number], to: [number, number]): Move {
+    move_remove(position: [number, number]): Move {
+        const cell = this.cells.getCell(...position);
+
+        const prevstate = {
+            cell: cell,
+            piece: cell.piece,
+            touched: cell.touched
+        };
+
+        const nextstate = {
+            cell: cell,
+            piece: null,
+            touched: true
+        };
+
+        return {
+            revert: () => {
+                prevstate.cell.piece = prevstate.piece;
+                prevstate.cell.touched = prevstate.touched;
+                return true;
+            },
+            execute: () => {
+                nextstate.cell.piece = nextstate.piece;
+                nextstate.cell.touched = nextstate.touched;
+                return true;
+            },
+            prenext: () => undefined,
+            revertprenext: () => undefined
+        };
+    }
+
+    move_take(from: [number, number], to: [number, number]): Move {
         const fromCell = this.cells.getCell(...from);
         const toCell = this.cells.getCell(...to);
 
@@ -62,6 +97,35 @@ export class BasicGame extends Detail {
                 nextstate.from.piece = nextstate.frompiece;
                 nextstate.from.touched = nextstate.fromtouched;
                 return true;
+            },
+            prenext: () => undefined,
+            revertprenext: () => undefined
+        };
+    }
+
+    move_mark(position: [number, number], marks: Record<string, unknown>, autorevert: boolean): Move {
+        const cell = this.cells.getCell(...position);
+        const currentmarks = { ...cell.marks };
+        const nextmarks = { ...marks };
+
+        return {
+            revert: () => {
+                cell.marks = currentmarks;
+                return true;
+            },
+            execute: () => {
+                cell.marks = nextmarks;
+                return true;
+            },
+            prenext: () => {
+                if (autorevert) {
+                    cell.marks = currentmarks;
+                }
+            },
+            revertprenext: () => {
+                if (autorevert) {
+                    cell.marks = nextmarks;
+                }
             }
         };
     }

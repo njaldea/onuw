@@ -8,6 +8,7 @@ export class Cell {
         this.touched = false;
         this.position = pos;
         this.coveredby = [];
+        this.marks = {};
     }
 
     id: number;
@@ -16,6 +17,7 @@ export class Cell {
     touched: boolean;
     position: [number, number];
     coveredby: [number, number][];
+    marks: Record<string, unknown>;
 }
 
 export class Cells {

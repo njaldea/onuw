@@ -1,4 +1,5 @@
 import type { Detail, Move } from '$lib/chess/game/Detail';
+import { GroupMove } from '$lib/chess/game/Detail';
 import { Piece } from '$lib/chess/Piece';
 
 export default class King extends Piece {
@@ -95,15 +96,13 @@ export default class King extends Piece {
 
     move(from: [number, number], to: [number, number]): Move {
         if (from[0] == to[0] && Math.abs(from[1] - to[1]) === 2) {
+            const mv = new GroupMove();
             const rookfile = from[1] > to[1] ? 0 : 7;
             const delta = from[1] > to[1] ? -1 : +1;
-            const rookmove = this.detail.move([from[0], rookfile], [to[0], from[1] + delta]);
-            const kingmove = this.detail.move(from, to);
-            return {
-                execute: () => kingmove.execute() && rookmove.execute(),
-                revert: () => rookmove.revert() && kingmove.revert()
-            };
+            mv.add(this.detail.move_take([from[0], rookfile], [to[0], from[1] + delta]));
+            mv.add(this.detail.move_take(from, to));
+            return mv;
         }
-        return this.detail.move(from, to);
+        return this.detail.move_take(from, to);
     }
 }

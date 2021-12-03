@@ -78,6 +78,6 @@ export default class RangedPiece extends Piece {
     }
 
     move(from: [number, number], to: [number, number]): Move {
-        return this.detail.move(from, to);
+        return this.detail.move_take(from, to);
     }
 }
