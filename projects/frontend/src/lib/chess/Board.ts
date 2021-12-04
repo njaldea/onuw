@@ -84,60 +84,50 @@ export class Board implements IBoard {
     }
 
     setTargetedMarkings(cell: Cell): void {
-        const kingcell = [...this.icells.iter()].filter(
-            (c) => c.piece && c.piece.role === 'K' && c.piece.team === cell.piece.team
-        )[0];
-        const checked = this.checked(kingcell);
         for (const c of this.icells.iter()) {
-            if (cell !== c && c.attackedby.includes(cell.id)) {
-                if (!checked || kingcell.id === cell.id || this.willVoidCheck(kingcell, cell, c)) {
-                    c.targeted = true;
-                }
+            if (cell !== c && c.attackedby.includes(cell.id) && this.validateMove(cell, c)) {
+                c.targeted = true;
             }
         }
         this.notify();
     }
 
-    // move this algorithm outside of Board. maybe to game detail
-    // and let this depend on it
-    checked(kingcell: Cell): boolean {
-        const cells = [...this.icells.iter()];
-        for (const kingattacker of kingcell.attackedby) {
-            if (cells[kingattacker].piece.team !== kingcell.piece.team) {
-                return true;
-            }
-        }
-        return false;
+    isInLine(p1: Cell, p2: Cell, p3: Cell) {
+        return (
+            (p2.position[1] - p1.position[1]) * (p3.position[0] - p1.position[0]) ===
+            (p2.position[0] - p1.position[0]) * (p3.position[1] - p1.position[1])
+        );
     }
 
-    willVoidCheck(kingcell: Cell, from: Cell, to: Cell): boolean {
+    // move this algorithm outside of Board. maybe to game detail
+    // and let this depend on it
+    validateMove(from: Cell, to: Cell): boolean {
         const cells = [...this.icells.iter()];
-        if (
-            kingcell.attackedby.map((id) => cells[id].piece.team !== kingcell.piece.team).length ===
-            1
-        ) {
-            const kingattacker = kingcell.attackedby[0];
-            if (kingattacker === to.id) {
-                return true;
-            }
-            if (to.attackedby.includes(kingattacker)) {
-                // rank/file
-                if (
-                    kingcell.position[0] === to.position[0] ||
-                    kingcell.position[1] === to.position[1]
-                ) {
-                    return true;
-                }
-                // diagonal
-                const diff = (p1, p2) => Math.abs(Math.abs(p1) - Math.abs(p2));
-                if (
-                    diff(kingcell.position[0], to.position[0]) ===
-                    diff(kingcell.position[1], to.position[1])
-                ) {
-                    return true;
+
+        const kingcell = cells.filter(
+            (c) => c.piece && c.piece.role === 'K' && c.piece.team === from.piece.team
+        )[0];
+
+        if (kingcell.id === from.id) {
+            return true;
+        } else if (kingcell.attackedby.length === 0) {
+            if (from.attackedby.length > 0) {
+                const pieceattackers = from.attackedby
+                    .map((id) => cells[id])
+                    .filter((a) => a.piece && !['P', 'K', 'N'].includes(a.piece.role));
+                for (const attacker of pieceattackers) {
+                    // check if pinned (order in line is important but assumed to be covered somewhere else)
+                    if (this.isInLine(attacker, kingcell, from)) {
+                        return attacker === to || this.isInLine(attacker, kingcell, to);
+                    }
                 }
             }
+            return true;
+        } else if (kingcell.attackedby.length === 1) {
+            const attacker = cells[kingcell.attackedby[0]];
+            return attacker === to || this.isInLine(attacker, kingcell, to);
+        } else {
+            return false;
         }
-        return false;
     }
 }
