@@ -7,7 +7,8 @@ export class Cell {
         this.targeted = false;
         this.touched = false;
         this.position = pos;
-        this.coveredby = [];
+        this.supportedby = [];
+        this.attackedby = [];
         this.marks = {};
     }
 
@@ -16,7 +17,8 @@ export class Cell {
     targeted: boolean;
     touched: boolean;
     position: [number, number];
-    coveredby: [number, number][];
+    supportedby: number[];
+    attackedby: number[];
     marks: Record<string, unknown>;
 }
 
@@ -60,17 +62,37 @@ export class Cells {
         }
     }
 
-    resetCellSupport(): void {
-        [...this.iter()].forEach((cell) => (cell.coveredby = []));
-        [...this.iter()].forEach((cell) => {
+    resetCellStates(): void {
+        const cells = [...this.iter()];
+        cells.forEach((cell) => {
+            cell.supportedby = [];
+            cell.attackedby = [];
+        });
+
+        const populate = (
+            cell: Cell,
+            moves: (r: number, f: number) => Generator<[number, number]>,
+            set: (c: Cell) => void
+        ) => {
             if (cell.piece != null) {
-                for (const [rank, file] of cell.piece.getSupportingMoves(...cell.position)) {
-                    const c = this.getCell(rank, file);
-                    if (c) {
-                        c.coveredby.push(cell.position);
-                    }
+                for (const [rank, file] of moves(...cell.position)) {
+                    set(this.getCell(rank, file));
                 }
             }
-        });
+        };
+        cells.forEach((cell) =>
+            populate(
+                cell,
+                (r, f) => cell.piece.getSupportingMoves(r, f),
+                (c) => c && c.supportedby.push(cell.id)
+            )
+        );
+        cells.forEach((cell) =>
+            populate(
+                cell,
+                (r, f) => cell.piece.getAttackingMoves(r, f),
+                (c) => c && c.attackedby.push(cell.id)
+            )
+        );
     }
 }

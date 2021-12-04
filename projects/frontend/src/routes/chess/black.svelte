@@ -14,10 +14,25 @@
     players.forEach((p) => fill(p, cells));
 
     const board: IBoard = new Board(players, cells);
+
+    let debug = false;
+
+    function keydown(ev: KeyboardEvent) {
+        if (ev.key === 'd') {
+            debug = true;
+        }
+    }
+    function keyup(ev: KeyboardEvent) {
+        if (ev.key === 'd') {
+            debug = false;
+        }
+    }
 </script>
 
+<svelte:window on:keydown={keydown} on:keyup={keyup} />
+
 <div>
-    <GameBoard flipped={true} {board} dimension={[cells.rcount, cells.ccount]} />
+    <GameBoard {debug} flipped={true} {board} dimension={[cells.rcount, cells.ccount]} />
 </div>
 
 <style>

@@ -23,7 +23,7 @@ export class Board implements IBoard {
         this.icells = c;
         this.subscribers = [];
 
-        this.icells.resetCellSupport();
+        this.icells.resetCellStates();
     }
 
     *cells(reverse: boolean): Generator<Cell> {
@@ -53,18 +53,24 @@ export class Board implements IBoard {
             return {
                 execute: () => {
                     const ret = move.execute();
-                    this.icells.resetCellSupport();
+                    this.icells.resetCellStates();
                     this.notify();
                     return ret;
                 },
                 revert: () => {
                     const ret = move.revert();
-                    this.icells.resetCellSupport();
                     this.notify();
                     return ret;
                 },
-                prenext: () => move.prenext(),
-                revertprenext: () => move.revertprenext()
+                prenext: () => {
+                    move.prenext();
+                    this.notify();
+                },
+                revertprenext: () => {
+                    move.revertprenext();
+                    this.icells.resetCellStates();
+                    this.notify();
+                }
             };
         }
         return null;
@@ -78,10 +84,11 @@ export class Board implements IBoard {
     }
 
     setTargetedMarkings(cell: Cell): void {
-        for (const [r, f] of cell.piece.getAttackingMoves(...cell.position)) {
-            const c = this.icells.getCell(r, f);
-            if (c) {
-                c.targeted = true;
+        for (const c of this.icells.iter()) {
+            if (cell !== c) {
+                if (c.attackedby.includes(cell.id)) {
+                    c.targeted = true;
+                }
             }
         }
         this.notify();

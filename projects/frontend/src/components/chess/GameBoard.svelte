@@ -11,6 +11,8 @@
 
     export let board: IBoard;
 
+    export let debug = false;
+
     const history: Move[] = [];
     const redoqueue: Move[] = [];
 
@@ -73,6 +75,7 @@
 <div class="board" style={`--rcount: ${dimension[0]}; --ccount: ${dimension[1]};`}>
     {#each [...$board.cells(!flipped)] as cell (cell)}
         <CellComponent
+            {debug}
             {cell}
             alt={dimension[1] % 2 === 0 ? cell.position[0] % 2 ^ cell.id % 2 : cell.id % 2}
             on:piecedragconfirm={dragconfirm}

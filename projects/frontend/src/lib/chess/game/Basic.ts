@@ -23,7 +23,15 @@ export class BasicGame extends Detail {
     }
 
     cell_supporters(r: number, f: number): [number, number][] {
-        return this.cells.getCell(r, f)?.coveredby ?? [];
+        const cell = this.cells.getCell(r, f);
+        if (cell) {
+            const idtopos = (_id): [number, number] => [
+                Math.floor(_id / this.cells.ccount),
+                _id % this.cells.ccount
+            ];
+            return cell.supportedby.map(idtopos);
+        }
+        return [];
     }
 
     piece(r: number, f: number): Piece {
@@ -103,7 +111,11 @@ export class BasicGame extends Detail {
         };
     }
 
-    move_mark(position: [number, number], marks: Record<string, unknown>, autorevert: boolean): Move {
+    move_mark(
+        position: [number, number],
+        marks: Record<string, unknown>,
+        autorevert: boolean
+    ): Move {
         const cell = this.cells.getCell(...position);
         const currentmarks = { ...cell.marks };
         const nextmarks = { ...marks };

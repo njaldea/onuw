@@ -49,28 +49,17 @@ export default class Pawn extends Piece {
     }
 
     *getSupportingMoves(r: number, f: number): Generator<[number, number]> {
-        const predicate = (_r: number, _f: number) => {
-            const piece = this.detail.piece(_r, _f);
-            if (piece && piece.team === this.team) {
-                return true;
-            }
-            const enpassant = this.detail.cell_marks(r, f)?.enpassant ?? null;
-            if (enpassant && enpassant[0] === _r && enpassant[1] === _f) {
-                return true;
-            }
-            return false;
-        };
-        yield* this.diagonalMove(...this.transform(r, f, 1, 1), predicate);
-        yield* this.diagonalMove(...this.transform(r, f, 1, -1), predicate);
+        yield* this.diagonalMove(...this.transform(r, f, 1, 1));
+        yield* this.diagonalMove(...this.transform(r, f, 1, -1));
     }
 
     *diagonalMove(
         r: number,
         f: number,
-        predicate: (_r: number, _f: number) => boolean
+        predicate: (_r: number, _f: number) => boolean = null
     ): Generator<[number, number]> {
         if (this.detail.cell_inbound(r, f)) {
-            if (predicate(r, f)) {
+            if (!predicate || predicate(r, f)) {
                 yield [r, f];
             }
         }

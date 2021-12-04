@@ -10,6 +10,8 @@
 
     const dispatch = createEventDispatcher();
 
+    export let debug = true;
+
     let grabbed = false;
 
     function start() {
@@ -39,6 +41,8 @@
     class:targeted={cell.targeted}
     class="cell"
     class:alt
+    class:debug
+    style={`--debug-detail: "${cell.id}"`}
     use:cellinterop
     on:piecedragconfirm
 >
@@ -50,6 +54,24 @@
 </div>
 
 <style>
+    div.debug {
+        position: relative;
+    }
+
+    div.debug::after {
+        background: white;
+        outline: solid 2px black;
+        color: black;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        min-width: 20px;
+        min-height: 20px;
+        padding: 0px 2px;
+        text-align: center;
+        content: var(--debug-detail);
+    }
+
     div {
         display: flex;
         align-items: center;

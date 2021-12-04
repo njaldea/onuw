@@ -48,7 +48,7 @@ export default class King extends Piece {
         rookfile: number,
         delta: number
     ): Generator<[number, number]> {
-        if (this.detail.cell_inbound(r, f) && !this.detail.cell_touched(r, f)) {
+        if (this.detail.cell_inbound(r, f) && !this.detail.cell_touched(r, rookfile)) {
             for (let i = f + delta; i != rookfile; i += delta) {
                 if (this.detail.piece(r, i)) {
                     return;
