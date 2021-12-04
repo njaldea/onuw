@@ -11,6 +11,7 @@
     const dispatch = createEventDispatcher();
 
     export let debug = true;
+    $: debugtext = `--debug-detail: "[${cell.id}]"`;
 
     let grabbed = false;
 
@@ -42,7 +43,7 @@
     class="cell"
     class:alt
     class:debug
-    style={`--debug-detail: "${cell.id}"`}
+    style={debugtext}
     use:cellinterop
     on:piecedragconfirm
 >
