@@ -3,6 +3,8 @@
     import { CHATTERS_URL } from '$lib/env';
     import wschatter from '$lib/ws-chatters';
 
+    import DebugTooltip from '$components/chess/DebugTooltip.svelte';
+
     let loaded = false;
     function connect() {
         wschatter
@@ -19,6 +21,7 @@
             <slot />
         </div>
     </div>
+    <DebugTooltip />
 {/if}
 
 <style>

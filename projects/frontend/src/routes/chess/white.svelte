@@ -7,6 +7,8 @@
     import { BasicGame } from '$lib/chess/game/Basic';
     import type { Detail } from '$lib/chess/game/Detail';
 
+    import tooltip from '$stores/tooltip';
+
     const cells = new Cells(8, 8);
     const gamedetail: Detail = new BasicGame(cells);
 
@@ -16,6 +18,7 @@
     const board: IBoard = new Board(players, cells);
 
     let debug = false;
+    $: debug ? tooltip.enable() : tooltip.disable();
 
     function keydown(ev: KeyboardEvent) {
         if (ev.key === 'd') {

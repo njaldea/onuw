@@ -2,6 +2,8 @@
     import { createEventDispatcher } from 'svelte';
     import type { Cell } from '$lib/chess/Cell';
 
+    import tooltip from '$stores/tooltip';
+
     export let alt: boolean;
     export let cell: Cell;
 
@@ -44,6 +46,8 @@
     class:alt
     class:debug
     style={debugtext}
+    on:mouseenter={() => tooltip.add(cell.id, cell)}
+    on:mouseleave={() => tooltip.remove(cell.id)}
     use:cellinterop
     on:piecedragconfirm
 >

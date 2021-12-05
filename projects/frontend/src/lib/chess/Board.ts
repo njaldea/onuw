@@ -92,11 +92,20 @@ export class Board implements IBoard {
         this.notify();
     }
 
-    isInLine(p1: Cell, p2: Cell, p3: Cell) {
-        return (
-            (p2.position[1] - p1.position[1]) * (p3.position[0] - p1.position[0]) ===
-            (p2.position[0] - p1.position[0]) * (p3.position[1] - p1.position[1])
-        );
+    isInOrder(c1: Cell, c2: Cell, c3: Cell) {
+        if (
+            (c2.position[1] - c1.position[1]) * (c3.position[0] - c1.position[0]) ===
+            (c2.position[0] - c1.position[0]) * (c3.position[1] - c1.position[1])
+        ) {
+            const sqr = (p: number) => p * p;
+            const distance = (p1: [number, number], p2: [number, number]) =>
+                sqr(p1[0]) - sqr(p2[0]) + (sqr(p1[1]) - sqr(p2[1]));
+            const d1 = Math.abs(distance(c1.position, c2.position));
+            const d2 = Math.abs(distance(c2.position, c3.position));
+            const d3 = Math.abs(distance(c1.position, c3.position));
+            return d3 > d1 && d3 > d2;
+        }
+        return false;
     }
 
     // move this algorithm outside of Board. maybe to game detail
@@ -116,16 +125,15 @@ export class Board implements IBoard {
                     .map((id) => cells[id])
                     .filter((a) => a.piece && !['P', 'K', 'N'].includes(a.piece.role));
                 for (const attacker of pieceattackers) {
-                    // check if pinned (order in line is important but assumed to be covered somewhere else)
-                    if (this.isInLine(attacker, kingcell, from)) {
-                        return attacker === to || this.isInLine(attacker, kingcell, to);
+                    if (this.isInOrder(kingcell, from, attacker)) {
+                        return attacker === to || this.isInOrder(kingcell, to, attacker);
                     }
                 }
             }
             return true;
         } else if (kingcell.attackedby.length === 1) {
             const attacker = cells[kingcell.attackedby[0]];
-            return attacker === to || this.isInLine(attacker, kingcell, to);
+            return attacker === to || this.isInOrder(kingcell, to, attacker);
         } else {
             return false;
         }
