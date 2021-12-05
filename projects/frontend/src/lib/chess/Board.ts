@@ -99,10 +99,10 @@ export class Board implements IBoard {
         ) {
             const sqr = (p: number) => p * p;
             const distance = (p1: [number, number], p2: [number, number]) =>
-                sqr(p1[0]) - sqr(p2[0]) + (sqr(p1[1]) - sqr(p2[1]));
-            const d1 = Math.abs(distance(c1.position, c2.position));
-            const d2 = Math.abs(distance(c2.position, c3.position));
-            const d3 = Math.abs(distance(c1.position, c3.position));
+                sqr(p1[0] - p2[0]) + sqr(p1[1] - p2[1]);
+            const d1 = distance(c1.position, c2.position);
+            const d2 = distance(c2.position, c3.position);
+            const d3 = distance(c1.position, c3.position);
             return d3 > d1 && d3 > d2;
         }
         return false;
