@@ -13,12 +13,14 @@
                 <th>ID</th>
                 <th>attackedby</th>
                 <th>supportedby</th>
+                <th>touched</th>
             </tr>
             {#each entries as [key, value] (key)}
                 <tr>
                     <td>{key}</td>
                     <td>{JSON.stringify(value.attackedby)}</td>
                     <td>{JSON.stringify(value.supportedby)}</td>
+                    <td>{value.touched}</td>
                 </tr>
             {/each}
         </table>

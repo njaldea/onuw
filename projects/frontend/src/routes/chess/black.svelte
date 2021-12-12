@@ -1,21 +1,13 @@
 <script lang="ts">
     import GameBoard from '$components/chess/GameBoard.svelte';
-    import { fill } from '$lib/chess/setup';
-    import { Cells } from '$lib/chess/Cell';
-    import { Player } from '$lib/chess/Player';
-    import { Board, IBoard } from '$lib/chess/Board';
-    import { BasicGame } from '$lib/chess/game/Basic';
-    import type { Detail } from '$lib/chess/game/Detail';
+    import { ChessEngine } from '$lib/chess/game/ChessEngine';
 
-    const cells = new Cells(8, 8);
-    const gamedetail: Detail = new BasicGame(cells);
+    import tooltip from '$stores/tooltip';
 
-    const players = [new Player(true, gamedetail), new Player(false, gamedetail)];
-    players.forEach((p) => fill(p, cells));
-
-    const board: IBoard = new Board(players, cells);
+    const engine = new ChessEngine();
 
     let debug = false;
+    $: debug ? tooltip.enable() : tooltip.disable();
 
     function keydown(ev: KeyboardEvent) {
         if (ev.key === 'd') {
@@ -30,9 +22,10 @@
 </script>
 
 <svelte:window on:keydown={keydown} on:keyup={keyup} />
+<svelte:head><title>Chess - Black</title></svelte:head>
 
 <div>
-    <GameBoard {debug} flipped={true} {board} dimension={[cells.rcount, cells.ccount]} />
+    <GameBoard {debug} flipped={true} {engine} />
 </div>
 
 <style>

@@ -1,79 +1,38 @@
 <script lang="ts">
     import CellComponent from '$components/chess/Cell.svelte';
-    import type { IBoard } from '$lib/chess/Board';
     import type { Cell } from '$lib/chess/Cell';
-    import type { Move } from '$lib/chess/game/Detail';
+    import type { Engine } from '$lib/chess/game/Engine';
 
-    export let dimension: [number, number];
     export let flipped: boolean;
 
-    export let teamToMove: boolean | null = true; // true == white
-
-    export let board: IBoard;
-
+    export let engine: Engine;
     export let debug = false;
 
-    const history: Move[] = [];
-    const redoqueue: Move[] = [];
-
     function undo() {
-        if (history.length > 0) {
-            const move = history.pop();
-            redoqueue.push(move);
-
-            if (move.revert() && teamToMove != null) {
-                teamToMove = !teamToMove;
-            }
-
-            if (history.length > 0) {
-                history[history.length - 1].revertprenext();
-            }
-        }
+        engine.prev();
     }
 
     function redo() {
-        if (redoqueue.length > 0) {
-            if (history.length > 0) {
-                history[history.length - 1].prenext();
-            }
-
-            const move = redoqueue.pop();
-            history.push(move);
-
-            if (move.execute() && teamToMove != null) {
-                teamToMove = !teamToMove;
-            }
-        }
+        engine.next();
     }
 
     function dragconfirm({ detail: { from, to } }) {
-        if (teamToMove == null || (from.piece && teamToMove === from.piece.team)) {
-            if (to.targeted) {
-                const move = board.move(from, to);
-                if (move) {
-                    redoqueue.splice(0, redoqueue.length);
-                    redoqueue.push(move);
-                    redo();
-                }
-            }
-
-            board.clearTargetedMarkings();
-        }
+        engine.moveconfirm(from, to);
     }
 
     function dragcancel() {
-        board.clearTargetedMarkings();
+        engine.movecancel();
     }
 
     function dragpiecestart({ detail: { cell } }: { detail: { cell: Cell } }) {
-        if (teamToMove == null || (cell.piece && teamToMove === cell.piece.team)) {
-            board.setTargetedMarkings(cell);
-        }
+        engine.movestart(cell);
     }
+
+    const dimension = engine.dimension();
 </script>
 
 <div class="board" style={`--rcount: ${dimension[0]}; --ccount: ${dimension[1]};`}>
-    {#each [...$board.cells(!flipped)] as cell (cell)}
+    {#each [...$engine.cells(!flipped)] as cell (cell)}
         <CellComponent
             {debug}
             {cell}
