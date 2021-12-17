@@ -1,9 +1,10 @@
-import type { Detail, Move } from '$lib/chess/game/Detail';
-import { Piece } from '$lib/chess/Piece';
+import type { IBoardPieceBridge } from '$lib/game/IBoardPieceBridge';
+import type { IMove } from '$lib/game/IMove';
+import { GamePiece, Piece } from '$lib/game/Piece';
 
-export default class Knight extends Piece {
-    constructor(team: boolean, detail: Detail) {
-        super('N', team, detail);
+export default class Knight extends GamePiece {
+    constructor(team: boolean, bridge: IBoardPieceBridge) {
+        super('N', team, bridge);
     }
 
     *getAttackingMoves(r: number, f: number): Generator<[number, number]> {
@@ -27,8 +28,8 @@ export default class Knight extends Piece {
                 }
 
                 const cell: [number, number] = [r + rd, f + fd];
-                if (this.detail.cell_inbound(...cell)) {
-                    const otherpiece = this.detail.piece(...cell);
+                if (this.bridge.cell_inbound(...cell)) {
+                    const otherpiece = this.bridge.piece(...cell);
                     if (otherpiece == null || predicate(otherpiece)) {
                         yield cell;
                     }
@@ -37,7 +38,7 @@ export default class Knight extends Piece {
         }
     }
 
-    move(from: [number, number], to: [number, number]): Move {
-        return this.detail.move_take(from, to);
+    move(from: [number, number], to: [number, number]): IMove {
+        return this.bridge.move_take(from, to);
     }
 }

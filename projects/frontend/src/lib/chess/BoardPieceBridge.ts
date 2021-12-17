@@ -1,45 +1,45 @@
-import type { Piece } from '../Piece';
-import type { Move } from './Detail';
-import type { Cells } from '../Cell';
-import { Detail } from './Detail';
+import type { Piece } from '$lib/game/Piece';
+import type { Cells } from '$lib/game/Cells';
+import { Move } from '$lib/game/IMove';
+import { IBoardPieceBridge } from '$lib/game/IBoardPieceBridge';
 
-export class BasicGame extends Detail {
-    cells: Cells;
+export class BoardPieceBridge extends IBoardPieceBridge {
+    #cells: Cells;
     constructor(cells: Cells) {
         super();
-        this.cells = cells;
+        this.#cells = cells;
     }
 
     cell_marks(r: number, f: number): Record<string, unknown> {
-        return { ...(this.cells.getCell(r, f)?.marks ?? {}) };
+        return { ...(this.#cells.getCell(r, f)?.marks ?? {}) };
     }
 
     cell_inbound(r: number, f: number): boolean {
-        return this.cells.isValidTile(r, f);
+        return this.#cells.isValidTile(r, f);
     }
 
     cell_touched(r: number, f: number): boolean {
-        return this.cells.getCell(r, f)?.touched ?? false;
+        return this.#cells.getCell(r, f)?.touched ?? false;
     }
 
-    cell_supporters(r: number, f: number): [number, number][] {
-        const cell = this.cells.getCell(r, f);
+    *cell_supporters(r: number, f: number): Generator<[number, number]> {
+        const cell = this.#cells.getCell(r, f);
         if (cell) {
-            const idtopos = (_id): [number, number] => [
-                Math.floor(_id / this.cells.ccount),
-                _id % this.cells.ccount
-            ];
-            return cell.supportedby.map(idtopos);
+            for (const id of cell.supportedby) {
+                const supportingcell = this.#cells.getCellByID(id);
+                if (supportingcell) {
+                    yield supportingcell.position;
+                }
+            }
         }
-        return [];
     }
 
     piece(r: number, f: number): Piece {
-        return this.cells.getCell(r, f)?.piece ?? null;
+        return this.#cells.getCell(r, f)?.piece ?? null;
     }
 
     move_remove(position: [number, number]): Move {
-        const cell = this.cells.getCell(...position);
+        const cell = this.#cells.getCell(...position);
 
         const prevstate = {
             cell: cell,
@@ -53,7 +53,7 @@ export class BasicGame extends Detail {
             touched: true
         };
 
-        return {
+        return new Move({
             revert: () => {
                 prevstate.cell.piece = prevstate.piece;
                 prevstate.cell.touched = prevstate.touched;
@@ -66,12 +66,12 @@ export class BasicGame extends Detail {
             },
             prenext: () => undefined,
             revertprenext: () => undefined
-        };
+        });
     }
 
     move_take(from: [number, number], to: [number, number]): Move {
-        const fromCell = this.cells.getCell(...from);
-        const toCell = this.cells.getCell(...to);
+        const fromCell = this.#cells.getCell(...from);
+        const toCell = this.#cells.getCell(...to);
 
         const prevstate = {
             to: toCell,
@@ -91,7 +91,7 @@ export class BasicGame extends Detail {
             fromtouched: true
         };
 
-        return {
+        return new Move({
             revert: () => {
                 prevstate.to.piece = prevstate.topiece;
                 prevstate.to.touched = prevstate.totouched;
@@ -108,7 +108,7 @@ export class BasicGame extends Detail {
             },
             prenext: () => undefined,
             revertprenext: () => undefined
-        };
+        });
     }
 
     move_mark(
@@ -116,11 +116,11 @@ export class BasicGame extends Detail {
         marks: Record<string, unknown>,
         autorevert: boolean
     ): Move {
-        const cell = this.cells.getCell(...position);
+        const cell = this.#cells.getCell(...position);
         const currentmarks = { ...cell.marks };
         const nextmarks = { ...marks };
 
-        return {
+        return new Move({
             revert: () => {
                 cell.marks = currentmarks;
                 return true;
@@ -139,6 +139,6 @@ export class BasicGame extends Detail {
                     cell.marks = nextmarks;
                 }
             }
-        };
+        });
     }
 }

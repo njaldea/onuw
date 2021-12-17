@@ -1,6 +1,6 @@
 <script lang="ts">
     import GameBoard from '$components/chess/GameBoard.svelte';
-    import { ChessEngine } from '$lib/chess/game/ChessEngine';
+    import { ChessEngine } from '$lib/chess/ChessEngine';
 
     import tooltip from '$stores/tooltip';
 

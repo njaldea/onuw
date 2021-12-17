@@ -1,20 +1,22 @@
+import type { Cell } from '$lib/game/Cell';
 import { derived, writable } from 'svelte/store';
+import type { Subscriber, Unsubscriber } from 'svelte/store';
 
-const store = writable<Record<string, unknown>>({});
+const store = writable<Record<number, Cell>>({});
 const enabled = writable<boolean>(false);
 const storeout = derived([enabled, store], ([e, v]) => {
     return e ? v : {};
 });
 export default {
-    subscribe: (cb) => storeout.subscribe(cb),
-    add: (key, text) => {
+    subscribe: (cb: Subscriber<Record<number, Cell>>): Unsubscriber => storeout.subscribe(cb),
+    add: (key: number, cell: Cell) => {
         store.update((v) => {
             const n = { ...v };
-            n[key] = text;
+            n[key] = cell;
             return n;
         });
     },
-    remove: (key) => {
+    remove: (key: number) => {
         store.update((v) => {
             const n = { ...v };
             delete n[key];

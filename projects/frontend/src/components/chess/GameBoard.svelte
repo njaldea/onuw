@@ -1,11 +1,11 @@
 <script lang="ts">
     import CellComponent from '$components/chess/Cell.svelte';
-    import type { Cell } from '$lib/chess/Cell';
-    import type { Engine } from '$lib/chess/game/Engine';
+    import type { Cell } from '$lib/game/Cell';
+    import type { IEngine } from '$lib/game/IEngine';
 
     export let flipped: boolean;
 
-    export let engine: Engine;
+    export let engine: IEngine;
     export let debug = false;
 
     function undo() {

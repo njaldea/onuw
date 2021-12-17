@@ -1,9 +1,9 @@
-import type { Detail } from '$lib/chess/game/Detail';
+import type { IBoardPieceBridge } from '$lib/game/IBoardPieceBridge';
 import RangedPiece from '$lib/chess/pieces/RangedPiece';
 
 export default class Queen extends RangedPiece {
-    constructor(team: boolean, detail: Detail) {
-        super('Q', team, detail, [
+    constructor(team: boolean, bridge: IBoardPieceBridge) {
+        super('Q', team, bridge, [
             [1, 0],
             [-1, 0],
             [0, 1],

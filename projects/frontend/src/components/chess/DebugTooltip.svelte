@@ -1,7 +1,7 @@
 <script lang="ts">
     import tooltip from '$stores/tooltip';
     import followmouse from '$lib/actions/followmouse';
-    import type { Cell } from '$lib/chess/Cell';
+    import type { Cell } from '$lib/game/Cell';
 
     $: entries = Object.entries($tooltip) as [string, Cell][];
 </script>

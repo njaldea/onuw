@@ -1,8 +1,9 @@
-import type { Detail, Move } from '$lib/chess/game/Detail';
-import { Piece } from '$lib/chess/Piece';
+import type { IBoardPieceBridge } from '$lib/game/IBoardPieceBridge';
+import type { IMove } from '$lib/game/IMove';
+import { GamePiece } from '$lib/game/Piece';
 
 function* getMoves(
-    self: Piece,
+    self: GamePiece,
     r: number,
     f: number,
     rd: number,
@@ -12,7 +13,7 @@ function* getMoves(
     for (let i = 0; limit == null || i < limit; ++i) {
         const rank = r + rd * (i + 1);
         const file = f + fd * (i + 1);
-        if (self.detail.cell_inbound(rank, file)) {
+        if (self.bridge.cell_inbound(rank, file)) {
             yield [rank, file];
         } else {
             break;
@@ -21,7 +22,7 @@ function* getMoves(
 }
 
 export function* getAttackingMoves(
-    self: Piece,
+    self: GamePiece,
     r: number,
     f: number,
     rd: number,
@@ -29,7 +30,7 @@ export function* getAttackingMoves(
     limit: null | number = null
 ): Generator<[number, number]> {
     for (const move of getMoves(self, r, f, rd, fd, limit)) {
-        const piece = self.detail.piece(move[0], move[1]);
+        const piece = self.bridge.piece(move[0], move[1]);
         if (piece == null || piece.team !== self.team) {
             yield move;
         }
@@ -40,7 +41,7 @@ export function* getAttackingMoves(
 }
 
 export function* getSupportingMoves(
-    self: Piece,
+    self: GamePiece,
     r: number,
     f: number,
     rd: number,
@@ -48,7 +49,7 @@ export function* getSupportingMoves(
     limit: null | number = null
 ): Generator<[number, number]> {
     for (const move of getMoves(self, r, f, rd, fd, limit)) {
-        const piece = self.detail.piece(...move);
+        const piece = self.bridge.piece(...move);
         if (piece == null || piece.team === self.team) {
             yield move;
         }
@@ -58,10 +59,16 @@ export function* getSupportingMoves(
     }
 }
 
-export default class RangedPiece extends Piece {
+export default class RangedPiece extends GamePiece {
     directions: [number, number][];
-    constructor(role: string, team: boolean, detail: Detail, directions: [number, number][]) {
-        super(role, team, detail);
+
+    constructor(
+        role: string,
+        team: boolean,
+        bridge: IBoardPieceBridge,
+        directions: [number, number][]
+    ) {
+        super(role, team, bridge);
         this.directions = directions;
     }
 
@@ -77,7 +84,7 @@ export default class RangedPiece extends Piece {
         }
     }
 
-    move(from: [number, number], to: [number, number]): Move {
-        return this.detail.move_take(from, to);
+    move(from: [number, number], to: [number, number]): IMove {
+        return this.bridge.move_take(from, to);
     }
 }

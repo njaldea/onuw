@@ -1,4 +1,4 @@
-import type { Cell } from '$lib/chess/Cell';
+import type { Cell } from '$lib/game/Cell';
 
 type Action = { destroy: () => void };
 
