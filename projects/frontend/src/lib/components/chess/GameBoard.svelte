@@ -1,5 +1,5 @@
 <script lang="ts">
-    import CellComponent from '$components/chess/Cell.svelte';
+    import CellComponent from '$lib/components/chess/Cell.svelte';
     import type { Cell } from '$lib/game/Cell';
     import type { IEngine } from '$lib/game/IEngine';
 

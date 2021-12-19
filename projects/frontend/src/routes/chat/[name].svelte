@@ -12,8 +12,8 @@
     import { onDestroy, onMount } from 'svelte';
     import { goto } from '$app/navigation';
 
-    import chatters from '$stores/chatters';
-    import messages from '$stores/messages';
+    import chatters from '$lib/stores/chatters';
+    import messages from '$lib/stores/messages';
 
     export let name: string;
     let msgtosend = '';

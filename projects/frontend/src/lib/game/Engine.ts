@@ -62,17 +62,15 @@ export abstract class Engine extends IEngine {
                 },
                 revert: () => {
                     const ret = move.revert();
+                    this.#cells.resetCellStates();
                     this.#observable.notify();
                     return ret;
                 },
                 prenext: () => {
                     move.prenext();
-                    this.#observable.notify();
                 },
                 revertprenext: () => {
                     move.revertprenext();
-                    this.#cells.resetCellStates();
-                    this.#observable.notify();
                 }
             });
         }

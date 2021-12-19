@@ -50,7 +50,6 @@ export class EditorEngine extends IEngine {
 
         const factorycells = [...this.#templates.iter()];
         const mover = (piece: Piece, from: [number, number], to: [number, number]): IMove => {
-            const fromCell = this.#templates.getCell(...from);
             const toCell = this.#cells.getCell(...to);
     
             const prevstate = {

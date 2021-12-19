@@ -1,5 +1,5 @@
 <script lang="ts">
-    import tooltip from '$stores/tooltip';
+    import tooltip from '$lib/stores/tooltip';
     import followmouse from '$lib/actions/followmouse';
     import type { Cell } from '$lib/game/Cell';
 

@@ -1,10 +1,10 @@
 <script lang="ts">
-    import EditorBoard from '$lib/components/chess/EditorBoard.svelte';
-    import { EditorEngine } from '$lib/chess/EditorEngine';
+    import GameBoard from '$lib/components/chess/GameBoard.svelte';
+    import { ChessEngine } from '$lib/chess/ChessEngine';
 
     import tooltip from '$lib/stores/tooltip';
 
-    const engine = new EditorEngine();
+    const engine = new ChessEngine();
 
     let debug = false;
     $: debug ? tooltip.enable() : tooltip.disable();
@@ -15,17 +15,19 @@
         }
     }
     function keyup(ev: KeyboardEvent) {
-        if (ev.key === 'd') {
+        if (ev.key === 'd') {   
             debug = false;
         }
     }
+
+    export let flipped = false;
 </script>
 
 <svelte:window on:keydown={keydown} on:keyup={keyup} />
 <svelte:head><title>Chess - White</title></svelte:head>
 
 <div>
-    <EditorBoard {debug} flipped={false} {engine} />
+    <GameBoard {debug} {flipped} {engine} />
 </div>
 
 <style>
