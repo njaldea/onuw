@@ -11,14 +11,14 @@ const config = {
         target: '#svelte',
         vite: {
             resolve: {
-                alias: {
-                }
+                alias: {}
             },
             envPrefix: 'ONUW_'
         },
         package: {
-            dir: "../bundle/package"
-        },
+            dir: '../bundle/package',
+            exports: (filename) => filename === 'index.ts'
+        }
     }
 };
 

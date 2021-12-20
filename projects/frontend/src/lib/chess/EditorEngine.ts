@@ -21,7 +21,7 @@ export class EditorEngine extends IEngine {
     moves: MoveSet;
 
     factories: Cells;
-    #observable: Observable<IEngine>
+    #observable: Observable<IEngine>;
 
     #cells: Cells;
     #templates: Cells;
@@ -49,19 +49,19 @@ export class EditorEngine extends IEngine {
         this.players.forEach((p) => fill(p, this.#cells));
 
         const factorycells = [...this.#templates.iter()];
-        const mover = (piece: Piece, from: [number, number], to: [number, number]): IMove => {
+        const mover = (piece: Piece, to: [number, number]): IMove => {
             const toCell = this.#cells.getCell(...to);
-    
+
             const prevstate = {
                 to: toCell,
-                topiece: toCell.piece,
+                topiece: toCell.piece
             };
-    
+
             const nextstate = {
                 to: toCell,
-                topiece: piece,
+                topiece: piece
             };
-    
+
             return new Move({
                 revert: () => {
                     prevstate.to.piece = prevstate.topiece;
@@ -114,7 +114,7 @@ export class EditorEngine extends IEngine {
     }
 
     moveconfirm(from: Cell, to: Cell) {
-        if (from.piece) {
+        if (this.#cells.includes(to) && from.piece) {
             const move = this._move(from, to);
             if (move) {
                 this.moves.push(move);

@@ -3,22 +3,26 @@ import svelte from 'rollup-plugin-svelte';
 import resolve from '@rollup/plugin-node-resolve';
 
 export default {
-    input: './index.js',
+    input: './package/index.js',
     output: [
         {
             file: 'out/iife.js',
             format: 'iife',
-            name: 'njla'
-        },
-        {
-            file: 'out/es.js',
-            format: 'es'
-        },
+            name: 'Chess'
+        }
+        // {
+        //     file: 'out/es.js',
+        //     format: 'es'
+        // }
         // {
         //     file: 'out/cjs.js',
         //     format: 'cjs'
         // }
     ],
+    onwarn: (warning, handler) => {
+        if (warning.code === 'THIS_IS_UNDEFINED') return;
+        handler(warning);
+    },
     plugins: [
         svelte({
             // By default, all ".svelte" files are compiled
@@ -52,7 +56,6 @@ export default {
 
             // You can pass any of the Svelte compiler options
             compilerOptions: {
-
                 // By default, the client-side compiler is used. You
                 // can also use the server-side rendering compiler
                 // generate: 'ssr',
@@ -68,7 +71,7 @@ export default {
             }
         }),
         // see NOTICE below
-        resolve({ browser: true }),
+        resolve({ browser: true })
         // ...
     ]
-}
+};

@@ -1,17 +1,17 @@
 {
-  "name": "@onuw/bundle",
-  "version": "1.0.0",
-  "description": "",
-  "main": "package/index.js",
-  "scripts": {
-    "build": "rollup -c"
-  },
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "@rollup/plugin-node-resolve": "^13.1.1",
-    "rollup": "^2.61.1",
-    "rollup-plugin-svelte": "^7.1.0",
-    "svelte": "^3.44.3"
-  }
+    "name": "@onuw/bundle",
+    "version": "1.0.0",
+    "description": "",
+    "main": "package/index.js",
+    "scripts": {
+        "build": "rollup -c"
+    },
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "@rollup/plugin-node-resolve": "^13.1.1",
+        "rollup": "^2.61.1",
+        "rollup-plugin-svelte": "^7.1.0",
+        "svelte": "^3.44.3"
+    }
 }

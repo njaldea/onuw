@@ -1,5 +1,5 @@
 <script lang="ts">
-    import Chess from '$lib/components/Chess.svelte'
+    import Chess from '$lib/components/Chess.svelte';
 </script>
 
-<Chess flipped={false}></Chess>
+<Chess flipped={false} />

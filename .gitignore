@@ -1,1 +1,9 @@
 node_modules
+
+projects/bundle/package
+projects/bundle/out
+!projects/bundle/out/index.html
+
+projects/frontend/build
+projects/frontend/.svelte-kit
+projects/frontend/.vercel_build_output

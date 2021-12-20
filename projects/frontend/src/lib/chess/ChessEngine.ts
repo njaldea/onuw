@@ -92,7 +92,7 @@ export class ChessEngine extends Engine {
                 return d3 > d1 && d3 > d2;
             }
             return false;
-        }
+        };
 
         const cells = [...this.cells(false)];
 

@@ -15,7 +15,7 @@
         }
     }
     function keyup(ev: KeyboardEvent) {
-        if (ev.key === 'd') {   
+        if (ev.key === 'd') {
             debug = false;
         }
     }

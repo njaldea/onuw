@@ -36,7 +36,9 @@
         <CellComponent
             {debug}
             {cell}
-            alt={dimension[1] % 2 === 0 ? cell.position[0] % 2 ^ cell.id % 2 : cell.id % 2}
+            alt={dimension[1] % 2 === 0
+                ? (cell.position[0] % 2 ^ cell.id % 2) > 0
+                : cell.id % 2 > 0}
             on:piecedragconfirm={dragconfirm}
             on:piecedragcancel={dragcancel}
             on:piecedragstart={dragpiecestart}
