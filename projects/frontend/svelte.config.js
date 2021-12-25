@@ -1,6 +1,5 @@
 import preprocess from 'svelte-preprocess';
 import adapter from '@sveltejs/adapter-vercel';
-import { resolve } from 'path';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
@@ -12,12 +11,13 @@ const config = {
         target: '#svelte',
         vite: {
             resolve: {
-                alias: {
-                    $stores: resolve('./src/stores'),
-                    $components: resolve('./src/components')
-                }
+                alias: {}
             },
             envPrefix: 'ONUW_'
+        },
+        package: {
+            dir: '../bundle/package',
+            exports: (filename) => filename === 'index.ts'
         }
     }
 };

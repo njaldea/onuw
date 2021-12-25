@@ -1,8 +1,8 @@
 <script lang="ts">
     import { createEventDispatcher } from 'svelte';
-    import type { Cell } from '$lib/chess/Cell';
+    import type { Cell } from '$lib/game/Cell';
 
-    import tooltip from '$stores/tooltip';
+    import tooltip from '$lib/stores/tooltip';
 
     export let alt: boolean;
     export let cell: Cell;

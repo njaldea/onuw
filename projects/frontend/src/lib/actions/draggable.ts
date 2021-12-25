@@ -1,4 +1,4 @@
-import type { Piece } from '$lib/chess/Piece';
+import type { Piece } from '$lib/game/Piece';
 import { spring } from 'svelte/motion';
 
 type Action = { destroy: () => void };

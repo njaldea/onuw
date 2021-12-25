@@ -1,5 +1,6 @@
-import type { Cell, Cells } from './Cell';
-import type { Player } from './Player';
+import type { Cell } from '$lib/game/Cell';
+import type { Cells } from '$lib/game/Cells';
+import type { Player } from '$lib/chess/Player';
 
 export function fill(p: Player, cells: Cells): void {
     const order = [

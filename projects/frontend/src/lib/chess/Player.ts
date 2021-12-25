@@ -1,12 +1,12 @@
-import type { Piece } from '$lib/chess/Piece';
+import type { Piece } from '$lib/game/Piece';
 
-import Pawn from './pieces/Pawn';
-import Knight from './pieces/Knight';
-import Rook from './pieces/Rook';
-import Bishop from './pieces/Bishop';
-import Queen from './pieces/Queen';
-import King from './pieces/King';
-import type { Detail } from './game/Detail';
+import Pawn from '$lib/chess/pieces/Pawn';
+import Knight from '$lib/chess/pieces/Knight';
+import Rook from '$lib/chess/pieces/Rook';
+import Bishop from '$lib/chess/pieces/Bishop';
+import Queen from '$lib/chess/pieces/Queen';
+import King from '$lib/chess/pieces/King';
+import type { IBoardPieceBridge } from '$lib/game/IBoardPieceBridge';
 
 export class Player {
     king: Piece;
@@ -16,7 +16,7 @@ export class Player {
     rook: Piece;
     pawn: Piece;
 
-    constructor(team: boolean, gamedetail: Detail) {
+    constructor(team: boolean, bridge: IBoardPieceBridge) {
         // assumes white always at rank 0
         const transform = (
             r: number,
@@ -27,11 +27,11 @@ export class Player {
             return this.king.team ? [r + rdelta, f + fdelta] : [r - rdelta, f - fdelta];
         };
 
-        this.king = new King(team, gamedetail);
-        this.queen = new Queen(team, gamedetail);
-        this.bishop = new Bishop(team, gamedetail);
-        this.knight = new Knight(team, gamedetail);
-        this.rook = new Rook(team, gamedetail);
-        this.pawn = new Pawn(team, gamedetail, transform);
+        this.king = new King(team, bridge);
+        this.queen = new Queen(team, bridge);
+        this.bishop = new Bishop(team, bridge);
+        this.knight = new Knight(team, bridge);
+        this.rook = new Rook(team, bridge);
+        this.pawn = new Pawn(team, bridge, transform);
     }
 }

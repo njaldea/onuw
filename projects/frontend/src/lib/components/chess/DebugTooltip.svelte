@@ -1,7 +1,7 @@
 <script lang="ts">
-    import tooltip from '$stores/tooltip';
+    import tooltip from '$lib/stores/tooltip';
     import followmouse from '$lib/actions/followmouse';
-    import type { Cell } from '$lib/chess/Cell';
+    import type { Cell } from '$lib/game/Cell';
 
     $: entries = Object.entries($tooltip) as [string, Cell][];
 </script>
@@ -13,12 +13,14 @@
                 <th>ID</th>
                 <th>attackedby</th>
                 <th>supportedby</th>
+                <th>touched</th>
             </tr>
             {#each entries as [key, value] (key)}
                 <tr>
                     <td>{key}</td>
                     <td>{JSON.stringify(value.attackedby)}</td>
                     <td>{JSON.stringify(value.supportedby)}</td>
+                    <td>{value.touched}</td>
                 </tr>
             {/each}
         </table>
