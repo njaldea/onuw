@@ -20,13 +20,13 @@ class Impl {
 }
 
 class ChessComponent {
-    #impl;
+    _impl;
     constructor(target: HTMLDivElement, props: { flipped?: boolean }) {
-        this.#impl = new Impl(target, props);
+        this._impl = new Impl(target, props);
     }
 
     flip() {
-        this.#impl.flip();
+        this._impl.flip();
     }
 }
 

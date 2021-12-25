@@ -4,29 +4,29 @@ import { Move } from '$lib/game/IMove';
 import { IBoardPieceBridge } from '$lib/game/IBoardPieceBridge';
 
 export class BoardPieceBridge extends IBoardPieceBridge {
-    #cells: Cells;
+    _cells: Cells;
     constructor(cells: Cells) {
         super();
-        this.#cells = cells;
+        this._cells = cells;
     }
 
     cell_marks(r: number, f: number): Record<string, unknown> {
-        return { ...(this.#cells.getCell(r, f)?.marks ?? {}) };
+        return { ...(this._cells.getCell(r, f)?.marks ?? {}) };
     }
 
     cell_inbound(r: number, f: number): boolean {
-        return this.#cells.isValidTile(r, f);
+        return this._cells.isValidTile(r, f);
     }
 
     cell_touched(r: number, f: number): boolean {
-        return this.#cells.getCell(r, f)?.touched ?? false;
+        return this._cells.getCell(r, f)?.touched ?? false;
     }
 
     *cell_supporters(r: number, f: number): Generator<[number, number]> {
-        const cell = this.#cells.getCell(r, f);
+        const cell = this._cells.getCell(r, f);
         if (cell) {
             for (const id of cell.supportedby) {
-                const supportingcell = this.#cells.getCellByID(id);
+                const supportingcell = this._cells.getCellByID(id);
                 if (supportingcell) {
                     yield supportingcell.position;
                 }
@@ -35,11 +35,11 @@ export class BoardPieceBridge extends IBoardPieceBridge {
     }
 
     piece(r: number, f: number): Piece {
-        return this.#cells.getCell(r, f)?.piece ?? null;
+        return this._cells.getCell(r, f)?.piece ?? null;
     }
 
     move_remove(position: [number, number]): Move {
-        const cell = this.#cells.getCell(...position);
+        const cell = this._cells.getCell(...position);
 
         const prevstate = {
             cell: cell,
@@ -70,8 +70,8 @@ export class BoardPieceBridge extends IBoardPieceBridge {
     }
 
     move_take(from: [number, number], to: [number, number]): Move {
-        const fromCell = this.#cells.getCell(...from);
-        const toCell = this.#cells.getCell(...to);
+        const fromCell = this._cells.getCell(...from);
+        const toCell = this._cells.getCell(...to);
 
         const prevstate = {
             to: toCell,
@@ -116,7 +116,7 @@ export class BoardPieceBridge extends IBoardPieceBridge {
         marks: Record<string, unknown>,
         autorevert: boolean
     ): Move {
-        const cell = this.#cells.getCell(...position);
+        const cell = this._cells.getCell(...position);
         const currentmarks = { ...cell.marks };
         const nextmarks = { ...marks };
 

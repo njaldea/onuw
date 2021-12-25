@@ -21,10 +21,10 @@ export class EditorEngine extends IEngine {
     moves: MoveSet;
 
     factories: Cells;
-    #observable: Observable<IEngine>;
+    _observable: Observable<IEngine>;
 
-    #cells: Cells;
-    #templates: Cells;
+    _cells: Cells;
+    _templates: Cells;
     templates: Cells;
 
     constructor() {
@@ -32,25 +32,25 @@ export class EditorEngine extends IEngine {
 
         const rcount = 8;
         const ccount = 8;
-        this.#cells = new Cells(rcount, ccount);
-        this.#templates = new Cells(2, 5);
-        this.templates = this.#templates;
+        this._cells = new Cells(rcount, ccount);
+        this._templates = new Cells(2, 5);
+        this.templates = this._templates;
 
-        this.#observable = new Observable<IEngine>(this);
+        this._observable = new Observable<IEngine>(this);
 
         this.rcount = rcount;
         this.ccount = ccount;
         this.moves = new MoveSet();
 
         // this one needs to be bypassed
-        const gamedetail: IBoardPieceBridge = new BoardPieceBridge(this.#cells);
+        const gamedetail: IBoardPieceBridge = new BoardPieceBridge(this._cells);
 
         this.players = [new Player(true, gamedetail), new Player(false, gamedetail)];
-        this.players.forEach((p) => fill(p, this.#cells));
+        this.players.forEach((p) => fill(p, this._cells));
 
-        const factorycells = [...this.#templates.iter()];
+        const factorycells = [...this._templates.iter()];
         const mover = (piece: Piece, to: [number, number]): IMove => {
-            const toCell = this.#cells.getCell(...to);
+            const toCell = this._cells.getCell(...to);
 
             const prevstate = {
                 to: toCell,
@@ -86,15 +86,15 @@ export class EditorEngine extends IEngine {
         factorycells[8].piece = new TemplatePiece(this.players[1].knight, mover);
         factorycells[9].piece = new TemplatePiece(this.players[1].pawn, mover);
 
-        this.#cells.resetCellStates();
+        this._cells.resetCellStates();
     }
 
     *cells(reverse: boolean): Generator<Cell> {
-        yield* this.#cells.iter(reverse);
+        yield* this._cells.iter(reverse);
     }
 
     subscribe(cb: Subscriber<IEngine>): Unsubscriber {
-        return this.#observable.subscribe(cb);
+        return this._observable.subscribe(cb);
     }
 
     next(): void {
@@ -114,7 +114,7 @@ export class EditorEngine extends IEngine {
     }
 
     moveconfirm(from: Cell, to: Cell) {
-        if (this.#cells.includes(to) && from.piece) {
+        if (this._cells.includes(to) && from.piece) {
             const move = this._move(from, to);
             if (move) {
                 this.moves.push(move);
@@ -129,21 +129,21 @@ export class EditorEngine extends IEngine {
             return new Move({
                 execute: () => {
                     const ret = move.execute();
-                    this.#observable.notify();
+                    this._observable.notify();
                     return ret;
                 },
                 revert: () => {
                     const ret = move.revert();
-                    this.#observable.notify();
+                    this._observable.notify();
                     return ret;
                 },
                 prenext: () => {
                     move.prenext();
-                    this.#observable.notify();
+                    this._observable.notify();
                 },
                 revertprenext: () => {
                     move.revertprenext();
-                    this.#observable.notify();
+                    this._observable.notify();
                 }
             });
         }

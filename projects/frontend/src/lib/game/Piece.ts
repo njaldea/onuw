@@ -45,15 +45,15 @@ export class TemplatePiece extends Piece {
     }
 
     move(from: [number, number], to: [number, number]): IMove {
-        return this.#mover(this.#piece, to);
+        return this._mover(this._piece, to);
     }
 
-    #piece: Piece;
-    #mover: (piece: Piece, to: [number, number]) => IMove;
+    _piece: Piece;
+    _mover: (piece: Piece, to: [number, number]) => IMove;
 
     constructor(piece: Piece, mover: (piece: Piece, to: [number, number]) => IMove) {
         super(`<${piece.role}>`, piece.team);
-        this.#piece = piece;
-        this.#mover = mover;
+        this._piece = piece;
+        this._mover = mover;
     }
 }

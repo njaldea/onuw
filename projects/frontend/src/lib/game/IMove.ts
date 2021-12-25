@@ -7,10 +7,10 @@ export abstract class IMove {
 }
 
 export class Move implements IMove {
-    #exec: () => boolean;
-    #revt: () => boolean;
-    #pnxt: () => void;
-    #rpxt: () => void;
+    _exec: () => boolean;
+    _revt: () => boolean;
+    _pnxt: () => void;
+    _rpxt: () => void;
 
     constructor({
         execute,
@@ -23,24 +23,24 @@ export class Move implements IMove {
         prenext: () => void;
         revertprenext: () => void;
     }) {
-        this.#exec = execute;
-        this.#revt = revert;
-        this.#pnxt = prenext;
-        this.#rpxt = revertprenext;
+        this._exec = execute;
+        this._revt = revert;
+        this._pnxt = prenext;
+        this._rpxt = revertprenext;
     }
     execute(): boolean {
-        return this.#exec();
+        return this._exec();
     }
     revert(): boolean {
-        return this.#revt();
+        return this._revt();
     }
 
     prenext(): void {
-        this.#pnxt();
+        this._pnxt();
     }
 
     revertprenext(): void {
-        this.#rpxt();
+        this._rpxt();
     }
 }
 

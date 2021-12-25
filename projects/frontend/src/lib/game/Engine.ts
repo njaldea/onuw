@@ -6,48 +6,48 @@ import { IMove, Move } from '$lib/game/IMove';
 import { IEngine } from './IEngine';
 
 export class Observable<T> {
-    #self: T;
-    #subscribers: Subscriber<T>[];
+    _self: T;
+    _subscribers: Subscriber<T>[];
 
     constructor(self: T) {
-        this.#self = self;
-        this.#subscribers = [];
+        this._self = self;
+        this._subscribers = [];
     }
 
     subscribe(cb: (self: T) => void): Unsubscriber {
-        cb(this.#self);
-        this.#subscribers.push(cb);
+        cb(this._self);
+        this._subscribers.push(cb);
         return () => {
-            const idx = this.#subscribers.indexOf(cb);
+            const idx = this._subscribers.indexOf(cb);
             if (idx >= 0) {
-                this.#subscribers.splice(idx, 1);
+                this._subscribers.splice(idx, 1);
             }
         };
     }
 
     notify(): void {
-        for (const cb of this.#subscribers) {
-            cb(this.#self);
+        for (const cb of this._subscribers) {
+            cb(this._self);
         }
     }
 }
 
 export abstract class Engine extends IEngine {
-    #cells: Cells;
-    #observable: Observable<IEngine>;
+    _cells: Cells;
+    _observable: Observable<IEngine>;
 
     constructor(c: Cells) {
         super();
-        this.#cells = c;
-        this.#observable = new Observable<IEngine>(this);
+        this._cells = c;
+        this._observable = new Observable<IEngine>(this);
     }
 
     *cells(reverse: boolean): Generator<Cell> {
-        yield* this.#cells.iter(reverse);
+        yield* this._cells.iter(reverse);
     }
 
     subscribe(cb: (self: IEngine) => void): Unsubscriber {
-        return this.#observable.subscribe(cb);
+        return this._observable.subscribe(cb);
     }
 
     _move(from: Cell, to: Cell): null | IMove {
@@ -56,14 +56,14 @@ export abstract class Engine extends IEngine {
             return new Move({
                 execute: () => {
                     const ret = move.execute();
-                    this.#cells.resetCellStates();
-                    this.#observable.notify();
+                    this._cells.resetCellStates();
+                    this._observable.notify();
                     return ret;
                 },
                 revert: () => {
                     const ret = move.revert();
-                    this.#cells.resetCellStates();
-                    this.#observable.notify();
+                    this._cells.resetCellStates();
+                    this._observable.notify();
                     return ret;
                 },
                 prenext: () => {
@@ -78,19 +78,19 @@ export abstract class Engine extends IEngine {
     }
 
     _clearTargetedMarkings(): void {
-        for (const cell of this.#cells.iter()) {
+        for (const cell of this._cells.iter()) {
             cell.targeted = false;
         }
-        this.#observable.notify();
+        this._observable.notify();
     }
 
     _setTargetedMarkings(cell: Cell): void {
-        for (const c of this.#cells.iter()) {
+        for (const c of this._cells.iter()) {
             if (cell !== c && c.attackedby.includes(cell.id) && this._isMoveValid(cell, c)) {
                 c.targeted = true;
             }
         }
-        this.#observable.notify();
+        this._observable.notify();
     }
 
     abstract _isMoveValid(from: Cell, to: Cell): boolean;

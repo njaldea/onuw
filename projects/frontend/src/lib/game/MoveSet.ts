@@ -1,27 +1,27 @@
 import type { IMove } from '$lib/game/IMove';
 
 export class MoveSet {
-    #done: IMove[];
-    #todo: IMove[];
+    _done: IMove[];
+    _todo: IMove[];
 
     constructor() {
-        this.#done = [];
-        this.#todo = [];
+        this._done = [];
+        this._todo = [];
     }
 
     push(move: IMove) {
-        this.#todo = [];
-        this.#todo.push(move);
+        this._todo = [];
+        this._todo.push(move);
     }
 
     next(): boolean {
-        if (this.#todo.length > 0) {
-            if (this.#done.length > 0) {
-                this.#done[this.#done.length - 1].prenext();
+        if (this._todo.length > 0) {
+            if (this._done.length > 0) {
+                this._done[this._done.length - 1].prenext();
             }
 
-            const move = this.#todo.pop();
-            this.#done.push(move);
+            const move = this._todo.pop();
+            this._done.push(move);
 
             return move.execute();
         }
@@ -29,14 +29,14 @@ export class MoveSet {
     }
 
     prev(): boolean {
-        if (this.#done.length > 0) {
-            const move = this.#done.pop();
-            this.#todo.push(move);
+        if (this._done.length > 0) {
+            const move = this._done.pop();
+            this._todo.push(move);
 
             const result = move.revert();
 
-            if (this.#done.length > 0) {
-                this.#done[this.#done.length - 1].revertprenext();
+            if (this._done.length > 0) {
+                this._done[this._done.length - 1].revertprenext();
             }
 
             return result;

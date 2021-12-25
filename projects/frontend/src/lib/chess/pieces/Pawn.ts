@@ -5,15 +5,15 @@ import { GamePiece } from '$lib/game/Piece';
 type MoveTransformer = (r: number, f: number, rdelta: number, fdelta: number) => [number, number];
 
 export default class Pawn extends GamePiece {
-    #transform: MoveTransformer;
+    _transform: MoveTransformer;
 
     constructor(team: boolean, bridge: IBoardPieceBridge, moveTransformer: MoveTransformer) {
         super('P', team, bridge);
-        this.#transform = moveTransformer;
+        this._transform = moveTransformer;
     }
 
     *getAttackingMoves(r: number, f: number): Generator<[number, number]> {
-        const [nextr, nextf] = this.#transform(r, f, 1, 0);
+        const [nextr, nextf] = this._transform(r, f, 1, 0);
         if (this.bridge.cell_inbound(nextr, nextf)) {
             if (this.bridge.piece(nextr, nextf) == null) {
                 yield [nextr, nextf];
@@ -31,13 +31,13 @@ export default class Pawn extends GamePiece {
             }
             return false;
         };
-        yield* this.diagonalMove(...this.#transform(r, f, 1, 1), predicate);
-        yield* this.diagonalMove(...this.#transform(r, f, 1, -1), predicate);
+        yield* this.diagonalMove(...this._transform(r, f, 1, 1), predicate);
+        yield* this.diagonalMove(...this._transform(r, f, 1, -1), predicate);
 
         if (!this.bridge.cell_touched(r, f)) {
-            const forward1 = this.#transform(r, f, 1, 0);
+            const forward1 = this._transform(r, f, 1, 0);
             if (this.bridge.cell_inbound(...forward1) && this.bridge.piece(...forward1) == null) {
-                const forward2 = this.#transform(r, f, 2, 0);
+                const forward2 = this._transform(r, f, 2, 0);
                 if (
                     this.bridge.cell_inbound(...forward2) &&
                     this.bridge.piece(...forward2) == null
@@ -49,8 +49,8 @@ export default class Pawn extends GamePiece {
     }
 
     *getSupportingMoves(r: number, f: number): Generator<[number, number]> {
-        yield* this.diagonalMove(...this.#transform(r, f, 1, 1));
-        yield* this.diagonalMove(...this.#transform(r, f, 1, -1));
+        yield* this.diagonalMove(...this._transform(r, f, 1, 1));
+        yield* this.diagonalMove(...this._transform(r, f, 1, -1));
     }
 
     *diagonalMove(
@@ -70,12 +70,12 @@ export default class Pawn extends GamePiece {
         moves.add(this.bridge.move_take(from, to));
 
         for (const fdelta of [+1, -1]) {
-            const pos = this.#transform(to[0], to[1], 0, fdelta);
+            const pos = this._transform(to[0], to[1], 0, fdelta);
             const piece = this.bridge.piece(...pos);
             if (piece && piece.team !== this.team && piece.role === this.role) {
                 const mark = {
                     ...this.bridge.cell_marks(...pos),
-                    enpassant: this.#transform(...to, -1, 0)
+                    enpassant: this._transform(...to, -1, 0)
                 };
                 moves.add(this.bridge.move_mark(pos, mark, true));
             }

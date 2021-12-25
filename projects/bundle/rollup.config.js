@@ -48,7 +48,8 @@ export default [
             }
         ],
         onwarn,
-        plugins: [...plugins, terser()]
+        // plugins: [...plugins, terser()]
+        plugins: [...plugins]
     },
     {
         input,
