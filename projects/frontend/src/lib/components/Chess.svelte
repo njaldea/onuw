@@ -3,6 +3,7 @@
     import { ChessEngine } from '$lib/chess/ChessEngine';
 
     import tooltip from '$lib/stores/tooltip';
+    import { browser } from '$app/env';
 
     const engine = new ChessEngine();
 
@@ -24,11 +25,12 @@
 </script>
 
 <svelte:window on:keydown={keydown} on:keyup={keyup} />
-<svelte:head><title>Chess - White</title></svelte:head>
 
-<div>
-    <GameBoard {debug} {flipped} {engine} />
-</div>
+{#if browser}
+    <div>
+        <GameBoard {debug} {flipped} {engine} />
+    </div>
+{/if}
 
 <style>
     div {

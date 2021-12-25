@@ -1,8 +1,10 @@
 import Chess from '$lib/components/Chess.svelte';
 
-class ChessComponent {
+// this is to hide internal type to consumers.
+class Impl {
     flipped: boolean;
     component: Chess;
+
     constructor(target, props) {
         this.flipped = props?.flipped || false;
         this.component = new Chess({
@@ -14,6 +16,17 @@ class ChessComponent {
     flip() {
         this.flipped = !this.flipped;
         this.component.$set({ flipped: this.flipped });
+    }
+}
+
+class ChessComponent {
+    #impl;
+    constructor(target: HTMLDivElement, props: { flipped?: boolean }) {
+        this.#impl = new Impl(target, props);
+    }
+
+    flip() {
+        this.#impl.flip();
     }
 }
 
