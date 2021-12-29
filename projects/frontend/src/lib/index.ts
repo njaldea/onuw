@@ -1,4 +1,4 @@
-import Chess from '$lib/components/Chess.svelte';
+import Chess from '$lib/components/Module.svelte';
 
 // this is to hide internal type to consumers.
 class Impl {

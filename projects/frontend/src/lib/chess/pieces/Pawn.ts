@@ -25,7 +25,9 @@ export default class Pawn extends GamePiece {
             if (piece && piece.team !== this.team) {
                 return true;
             }
-            const enpassant = this.bridge.cell_marks(r, f)?.enpassant ?? null;
+            const enpassant: null | [number, number] =
+                (this.bridge.cell_marks(r, f)?.enpassant as [number, number]) ?? null;
+
             if (enpassant && enpassant[0] === _r && enpassant[1] === _f) {
                 return true;
             }
@@ -99,7 +101,8 @@ export default class Pawn extends GamePiece {
         const moves = new GroupMove();
         moves.add(this.bridge.move_take(from, to));
 
-        const enpassant = this.bridge.cell_marks(...from)?.enpassant ?? null;
+        const enpassant: null | [number, number] =
+            (this.bridge.cell_marks(...from)?.enpassant as [number, number]) ?? null;
         if (enpassant != null && enpassant[0] === to[0] && enpassant[1] === to[1]) {
             moves.add(this.bridge.move_remove([from[0], to[1]]));
         }
