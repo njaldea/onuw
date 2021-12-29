@@ -9,14 +9,14 @@ import King from '$lib/chess/pieces/King';
 import type { IBoardPieceBridge } from '$lib/game/IBoardPieceBridge';
 
 export class Player {
-    king: Piece;
-    queen: Piece;
-    bishop: Piece;
-    knight: Piece;
-    rook: Piece;
-    pawn: Piece;
+    public king: Piece;
+    public queen: Piece;
+    public bishop: Piece;
+    public knight: Piece;
+    public rook: Piece;
+    public pawn: Piece;
 
-    constructor(team: boolean, bridge: IBoardPieceBridge) {
+    public constructor(team: boolean, bridge: IBoardPieceBridge) {
         // assumes white always at rank 0
         const transform = (
             r: number,

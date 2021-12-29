@@ -1,28 +1,15 @@
-<script lang="ts">
-    import { onMount } from 'svelte';
-    import { CHATTERS_URL } from '$lib/env';
-    import wschatter from '$lib/ws-chatters';
+<div class="root">
+    <div>
+        <nav>
+            <a href="/chat">Chat</a>
+            <a href="/chess/both">Chess</a>
+            <a href="/chess/white">Chess - White</a>
+            <a href="/chess/black">Chess - Black</a>
+        </nav>
 
-    import DebugTooltip from '$lib/components/chess/DebugTooltip.svelte';
-
-    let loaded = false;
-    function connect() {
-        wschatter
-            .connect(CHATTERS_URL)
-            .then(() => (loaded = true))
-            .catch(() => setTimeout(connect, 1000));
-    }
-    onMount(connect);
-</script>
-
-{#if loaded}
-    <div class="root">
-        <div>
-            <slot />
-        </div>
+        <slot />
     </div>
-    <DebugTooltip />
-{/if}
+</div>
 
 <style>
     .root > div {
@@ -46,5 +33,9 @@
         display: grid;
         color: var(--color);
         background-color: var(--background-color);
+    }
+
+    a {
+        color: white;
     }
 </style>

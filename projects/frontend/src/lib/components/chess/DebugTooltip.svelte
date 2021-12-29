@@ -1,7 +1,10 @@
 <script lang="ts">
-    import tooltip from '$lib/stores/tooltip';
     import followmouse from '$lib/actions/followmouse';
+    import { getContext } from 'svelte';
+    import type { Tooltip } from '$lib/game/Tooltip';
     import type { Cell } from '$lib/game/Cell';
+
+    const tooltip = getContext<Tooltip>('tooltip');
 
     $: entries = Object.entries($tooltip) as [string, Cell][];
 </script>

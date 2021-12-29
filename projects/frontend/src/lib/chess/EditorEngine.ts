@@ -14,43 +14,40 @@ import { IEngine } from '$lib/game/IEngine';
 import type { Subscriber, Unsubscriber } from 'svelte/store';
 
 export class EditorEngine extends IEngine {
-    players: [Player, Player];
+    private players: [Player, Player];
 
-    rcount: number;
-    ccount: number;
-    moves: MoveSet;
+    private rcount: number;
+    private ccount: number;
+    private moves: MoveSet;
 
-    factories: Cells;
-    _observable: Observable<IEngine>;
+    private observable: Observable<IEngine>;
 
-    _cells: Cells;
-    _templates: Cells;
-    templates: Cells;
+    private icells: Cells;
+    public templates: Cells;
 
-    constructor() {
+    public constructor() {
         super();
 
         const rcount = 8;
         const ccount = 8;
-        this._cells = new Cells(rcount, ccount);
-        this._templates = new Cells(2, 5);
-        this.templates = this._templates;
+        this.icells = new Cells(rcount, ccount);
+        this.templates = new Cells(2, 5);
 
-        this._observable = new Observable<IEngine>(this);
+        this.observable = new Observable<IEngine>(this);
 
         this.rcount = rcount;
         this.ccount = ccount;
         this.moves = new MoveSet();
 
         // this one needs to be bypassed
-        const gamedetail: IBoardPieceBridge = new BoardPieceBridge(this._cells);
+        const gamedetail: IBoardPieceBridge = new BoardPieceBridge(this.icells);
 
         this.players = [new Player(true, gamedetail), new Player(false, gamedetail)];
-        this.players.forEach((p) => fill(p, this._cells));
+        this.players.forEach((p) => fill(p, this.icells));
 
-        const factorycells = [...this._templates.iter()];
+        const factorycells = [...this.templates.iter()];
         const mover = (piece: Piece, to: [number, number]): IMove => {
-            const toCell = this._cells.getCell(...to);
+            const toCell = this.icells.getCell(...to);
 
             const prevstate = {
                 to: toCell,
@@ -86,36 +83,40 @@ export class EditorEngine extends IEngine {
         factorycells[8].piece = new TemplatePiece(this.players[1].knight, mover);
         factorycells[9].piece = new TemplatePiece(this.players[1].pawn, mover);
 
-        this._cells.resetCellStates();
+        this.icells.resetCellStates();
     }
 
-    *cells(reverse: boolean): Generator<Cell> {
-        yield* this._cells.iter(reverse);
+    override *cells(reverse: boolean): Generator<Cell> {
+        yield* this.icells.iter(reverse);
     }
 
-    subscribe(cb: Subscriber<IEngine>): Unsubscriber {
-        return this._observable.subscribe(cb);
+    override dimension(): [number, number] {
+        return [this.rcount, this.ccount];
     }
 
-    next(): void {
+    override subscribe(cb: Subscriber<IEngine>): Unsubscriber {
+        return this.observable.subscribe(cb);
+    }
+
+    override next(): void {
         this.moves.next();
     }
 
-    prev(): void {
+    override prev(): void {
         this.moves.prev();
     }
 
-    movestart(cell: Cell) {
+    override movestart(cell: Cell) {
         // do nothing
     }
 
-    movecancel() {
+    override movecancel() {
         // do nothing
     }
 
-    moveconfirm(from: Cell, to: Cell) {
-        if (this._cells.includes(to) && from.piece) {
-            const move = this._move(from, to);
+    override moveconfirm(from: Cell, to: Cell) {
+        if (this.icells.includes(to) && from.piece) {
+            const move = this.move(from, to);
             if (move) {
                 this.moves.push(move);
                 this.next();
@@ -123,34 +124,30 @@ export class EditorEngine extends IEngine {
         }
     }
 
-    _move(from: Cell, to: Cell): null | IMove {
+    private move(from: Cell, to: Cell): null | IMove {
         const move = from.piece.move(from.position, to.position);
         if (move) {
             return new Move({
                 execute: () => {
                     const ret = move.execute();
-                    this._observable.notify();
+                    this.observable.notify();
                     return ret;
                 },
                 revert: () => {
                     const ret = move.revert();
-                    this._observable.notify();
+                    this.observable.notify();
                     return ret;
                 },
                 prenext: () => {
                     move.prenext();
-                    this._observable.notify();
+                    this.observable.notify();
                 },
                 revertprenext: () => {
                     move.revertprenext();
-                    this._observable.notify();
+                    this.observable.notify();
                 }
             });
         }
         return null;
-    }
-
-    dimension(): [number, number] {
-        return [this.rcount, this.ccount];
     }
 }

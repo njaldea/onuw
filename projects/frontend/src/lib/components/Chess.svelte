@@ -2,12 +2,15 @@
     import GameBoard from '$lib/components/chess/GameBoard.svelte';
     import { ChessEngine } from '$lib/chess/ChessEngine';
 
-    import tooltip from '$lib/stores/tooltip';
+    import type { Tooltip } from '$lib/game/Tooltip';
     import { browser } from '$app/env';
+    import { getContext } from 'svelte';
 
     const engine = new ChessEngine();
 
     let debug = false;
+
+    const tooltip = getContext<Tooltip>('tooltip');
     $: debug ? tooltip.enable() : tooltip.disable();
 
     function keydown(ev: KeyboardEvent) {
@@ -15,6 +18,7 @@
             debug = true;
         }
     }
+
     function keyup(ev: KeyboardEvent) {
         if (ev.key === 'd') {
             debug = false;

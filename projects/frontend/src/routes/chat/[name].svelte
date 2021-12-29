@@ -1,19 +1,23 @@
 <script lang="ts" context="module">
-    export function load({ page }) {
-        return {
-            props: {
-                name: page.params.name
-            }
-        };
+    export function load({
+        page: {
+            params: { name }
+        }
+    }: {
+        page: { params: { name: string } };
+    }) {
+        return { props: { name } };
     }
 </script>
 
 <script lang="ts">
-    import { onDestroy, onMount } from 'svelte';
+    import { onDestroy, onMount, getContext } from 'svelte';
     import { goto } from '$app/navigation';
+    import type { Chatters } from '$lib/connection/Chatters';
+    import type { Messages } from '$lib/connection/Messages';
 
-    import chatters from '$lib/stores/chatters';
-    import messages from '$lib/stores/messages';
+    const chatters = getContext<Chatters>('chatters');
+    const messages = getContext<Messages>('messages');
 
     export let name: string;
     let msgtosend = '';
@@ -30,7 +34,7 @@
 </script>
 
 <div class="root">
-    <button on:click={() => goto('/')}>HOME</button>
+    <button on:click={() => goto('/chat')}>HOME</button>
     <div class="header">
         <h3>{name}</h3>
     </div>

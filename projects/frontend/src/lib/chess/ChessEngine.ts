@@ -10,15 +10,15 @@ import { MoveSet } from '$lib/game/MoveSet';
 import { Engine } from '$lib/game/Engine';
 
 export class ChessEngine extends Engine {
-    players: [Player, Player];
+    private players: [Player, Player];
 
-    rcount: number;
-    ccount: number;
-    moves: MoveSet;
+    private rcount: number;
+    private ccount: number;
+    private moves: MoveSet;
 
-    teamtomove: boolean;
+    private teamtomove: boolean;
 
-    constructor() {
+    public constructor() {
         const rcount = 8;
         const ccount = 8;
         const cells = new Cells(rcount, ccount);
@@ -37,32 +37,32 @@ export class ChessEngine extends Engine {
         cells.resetCellStates();
     }
 
-    next(): void {
+    override next(): void {
         if (this.moves.next()) {
             this.teamtomove = !this.teamtomove;
         }
     }
 
-    prev(): void {
+    override prev(): void {
         if (this.moves.prev()) {
             this.teamtomove = !this.teamtomove;
         }
     }
 
-    movestart(cell: Cell) {
+    override movestart(cell: Cell) {
         if (cell.piece && this.teamtomove === cell.piece.team) {
-            this._setTargetedMarkings(cell);
+            this.setTargetedMarkings(cell);
         }
     }
 
-    movecancel() {
-        this._clearTargetedMarkings();
+    override movecancel() {
+        this.clearTargetedMarkings();
     }
 
-    moveconfirm(from: Cell, to: Cell) {
+    override moveconfirm(from: Cell, to: Cell) {
         if (from.piece && this.teamtomove === from.piece.team) {
             if (to.targeted) {
-                const move = this._move(from, to);
+                const move = this.move(from, to);
                 if (move) {
                     this.moves.push(move);
                     this.next();
@@ -70,14 +70,14 @@ export class ChessEngine extends Engine {
             }
         }
 
-        this._clearTargetedMarkings();
+        this.clearTargetedMarkings();
     }
 
-    dimension(): [number, number] {
+    override dimension(): [number, number] {
         return [this.rcount, this.ccount];
     }
 
-    _isMoveValid(from: Cell, to: Cell): boolean {
+    override isMoveValid(from: Cell, to: Cell): boolean {
         const isInOrder = (c1: Cell, c2: Cell, c3: Cell): boolean => {
             if (
                 (c2.position[1] - c1.position[1]) * (c3.position[0] - c1.position[0]) ===

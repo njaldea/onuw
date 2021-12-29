@@ -1,8 +1,7 @@
 <script lang="ts">
-    import { createEventDispatcher } from 'svelte';
+    import { createEventDispatcher, getContext } from 'svelte';
     import type { Cell } from '$lib/game/Cell';
-
-    import tooltip from '$lib/stores/tooltip';
+    import type { Tooltip } from '$lib/game/Tooltip';
 
     export let alt: boolean;
     export let cell: Cell;
@@ -11,9 +10,9 @@
     import cellinteropaction from '$lib/actions/cellinterop';
 
     const dispatch = createEventDispatcher();
+    const tooltip = getContext<Tooltip>('tooltip');
 
     export let debug = true;
-    $: debugtext = `--debug-detail: "[${cell.id}]"`;
 
     let grabbed = false;
 
@@ -45,7 +44,6 @@
     class="cell"
     class:alt
     class:debug
-    style={debugtext}
     on:mouseenter={() => tooltip.add(cell.id, cell)}
     on:mouseleave={() => tooltip.remove(cell.id)}
     use:cellinterop

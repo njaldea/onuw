@@ -1,13 +1,17 @@
 <script lang="ts">
     import EditorBoard from '$lib/components/chess/EditorBoard.svelte';
     import { EditorEngine } from '$lib/chess/EditorEngine';
+    import { getContext, onMount } from 'svelte';
+    import type { Tooltip } from '$lib/game/Tooltip';
 
-    import tooltip from '$lib/stores/tooltip';
+    let tooltip: Tooltip = null;
+
+    onMount(() => (tooltip = getContext<Tooltip>('tooltip')));
 
     const engine = new EditorEngine();
 
     let debug = false;
-    $: debug ? tooltip.enable() : tooltip.disable();
+    $: tooltip && debug ? tooltip.enable() : tooltip.disable();
 
     function keydown(ev: KeyboardEvent) {
         if (ev.key === 'd') {

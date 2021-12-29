@@ -5,7 +5,7 @@ class Impl {
     flipped: boolean;
     component: Chess;
 
-    constructor(target, props) {
+    public constructor(target: HTMLDivElement, props: { flipped?: boolean }) {
         this.flipped = props?.flipped || false;
         this.component = new Chess({
             target: target,
@@ -13,20 +13,20 @@ class Impl {
         });
     }
 
-    flip() {
+    public flip() {
         this.flipped = !this.flipped;
         this.component.$set({ flipped: this.flipped });
     }
 }
 
 class ChessComponent {
-    _impl;
-    constructor(target: HTMLDivElement, props: { flipped?: boolean }) {
-        this._impl = new Impl(target, props);
+    private impl: Impl;
+    public constructor(target: HTMLDivElement, props: { flipped?: boolean }) {
+        this.impl = new Impl(target, props);
     }
 
-    flip() {
-        this._impl.flip();
+    public flip() {
+        this.impl.flip();
     }
 }
 

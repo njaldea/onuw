@@ -1,18 +1,18 @@
 export abstract class IMove {
-    abstract execute(): boolean;
-    abstract revert(): boolean;
+    public abstract execute(): boolean;
+    public abstract revert(): boolean;
 
-    abstract prenext(): void;
-    abstract revertprenext(): void;
+    public abstract prenext(): void;
+    public abstract revertprenext(): void;
 }
 
-export class Move implements IMove {
-    _exec: () => boolean;
-    _revt: () => boolean;
-    _pnxt: () => void;
-    _rpxt: () => void;
+export class Move extends IMove {
+    private exec: () => boolean;
+    private revt: () => boolean;
+    private pnxt: () => void;
+    private rpxt: () => void;
 
-    constructor({
+    public constructor({
         execute,
         revert,
         prenext,
@@ -23,54 +23,58 @@ export class Move implements IMove {
         prenext: () => void;
         revertprenext: () => void;
     }) {
-        this._exec = execute;
-        this._revt = revert;
-        this._pnxt = prenext;
-        this._rpxt = revertprenext;
-    }
-    execute(): boolean {
-        return this._exec();
-    }
-    revert(): boolean {
-        return this._revt();
+        super();
+        this.exec = execute;
+        this.revt = revert;
+        this.pnxt = prenext;
+        this.rpxt = revertprenext;
     }
 
-    prenext(): void {
-        this._pnxt();
+    override execute(): boolean {
+        return this.exec();
     }
 
-    revertprenext(): void {
-        this._rpxt();
+    override revert(): boolean {
+        return this.revt();
+    }
+
+    override prenext(): void {
+        this.pnxt();
+    }
+
+    override revertprenext(): void {
+        this.rpxt();
     }
 }
 
-export class GroupMove implements IMove {
-    moves: IMove[];
+export class GroupMove extends IMove {
+    private moves: IMove[];
 
-    constructor() {
+    public constructor() {
+        super();
         this.moves = [];
     }
 
-    add(move: IMove): void {
+    public add(move: IMove): void {
         this.moves.push(move);
     }
 
-    execute() {
+    override execute() {
         this.moves.forEach((m) => m.execute());
         return true;
     }
 
-    revert() {
+    override revert() {
         this.moves.forEach((m) => m.revert());
         return true;
     }
 
-    prenext() {
+    override prenext() {
         this.moves.forEach((m) => m.prenext());
         return true;
     }
 
-    revertprenext() {
+    override revertprenext() {
         this.moves.forEach((m) => m.revertprenext());
         return true;
     }

@@ -1,7 +1,7 @@
 import type { Piece } from '$lib/game/Piece';
 
 export class Cell {
-    constructor(i: number, pos: [number, number]) {
+    public constructor(i: number, pos: [number, number]) {
         this.id = i;
         this.piece = null;
         this.targeted = false;
@@ -12,12 +12,12 @@ export class Cell {
         this.marks = {};
     }
 
-    id: number;
-    piece: null | Piece;
-    targeted: boolean;
-    touched: boolean;
-    position: [number, number];
-    supportedby: number[];
-    attackedby: number[];
-    marks: Record<string, unknown>;
+    public id: number;
+    public piece: null | Piece;
+    public targeted: boolean;
+    public touched: boolean;
+    public position: [number, number];
+    public supportedby: number[];
+    public attackedby: number[];
+    public marks: Record<string, unknown>;
 }

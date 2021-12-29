@@ -60,9 +60,9 @@ export function* getSupportingMoves(
 }
 
 export default class RangedPiece extends GamePiece {
-    directions: [number, number][];
+    private directions: [number, number][];
 
-    constructor(
+    public constructor(
         role: string,
         team: boolean,
         bridge: IBoardPieceBridge,
@@ -72,19 +72,19 @@ export default class RangedPiece extends GamePiece {
         this.directions = directions;
     }
 
-    *getAttackingMoves(r: number, f: number): Generator<[number, number]> {
+    override *getAttackingMoves(r: number, f: number): Generator<[number, number]> {
         for (const direction of this.directions) {
             yield* getAttackingMoves(this, r, f, ...direction);
         }
     }
 
-    *getSupportingMoves(r: number, f: number): Generator<[number, number]> {
+    override *getSupportingMoves(r: number, f: number): Generator<[number, number]> {
         for (const direction of this.directions) {
             yield* getSupportingMoves(this, r, f, ...direction);
         }
     }
 
-    move(from: [number, number], to: [number, number]): IMove {
+    override move(from: [number, number], to: [number, number]): IMove {
         return this.bridge.move_take(from, to);
     }
 }
