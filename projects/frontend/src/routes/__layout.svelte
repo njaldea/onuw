@@ -1,5 +1,12 @@
 <div class="root">
     <div>
+        <nav>
+            <a href="/chat">Chat</a>
+            <a href="/chess/both">Chess</a>
+            <a href="/chess/white">Chess - White</a>
+            <a href="/chess/black">Chess - Black</a>
+        </nav>
+
         <slot />
     </div>
 </div>
@@ -26,5 +33,9 @@
         display: grid;
         color: var(--color);
         background-color: var(--background-color);
+    }
+
+    a {
+        color: white;
     }
 </style>

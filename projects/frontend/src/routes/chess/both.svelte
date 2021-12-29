@@ -1,11 +1,17 @@
+<script lang="ts">
+    import Chess from '$lib/components/Chess.svelte';
+</script>
+
+<svelte:head><title>Chess</title></svelte:head>
+
 <div class="root">
     <div class="board">
         <p>white</p>
-        <iframe title="white" src="/chess/white" />
+        <Chess flipped={false} />
     </div>
     <div class="board">
         <p>black</p>
-        <iframe title="black" src="/chess/black" />
+        <Chess flipped={true} />
     </div>
 </div>
 
@@ -22,10 +28,5 @@
         align-items: center;
         width: 100%;
         aspect-ratio: 1;
-    }
-
-    iframe {
-        width: 100%;
-        height: 100%;
     }
 </style>
