@@ -4,29 +4,29 @@ import { Move } from '$lib/game/IMove';
 import { IBoardPieceBridge } from '$lib/game/IBoardPieceBridge';
 
 export class BoardPieceBridge extends IBoardPieceBridge {
-    _cells: Cells;
-    constructor(cells: Cells) {
+    private cells: Cells;
+    public constructor(cells: Cells) {
         super();
-        this._cells = cells;
+        this.cells = cells;
     }
 
-    cell_marks(r: number, f: number): Record<string, unknown> {
-        return { ...(this._cells.getCell(r, f)?.marks ?? {}) };
+    override cell_marks(r: number, f: number): Record<string, unknown> {
+        return { ...(this.cells.getCell(r, f)?.marks ?? {}) };
     }
 
-    cell_inbound(r: number, f: number): boolean {
-        return this._cells.isValidTile(r, f);
+    override cell_inbound(r: number, f: number): boolean {
+        return this.cells.isValidTile(r, f);
     }
 
-    cell_touched(r: number, f: number): boolean {
-        return this._cells.getCell(r, f)?.touched ?? false;
+    override cell_touched(r: number, f: number): boolean {
+        return this.cells.getCell(r, f)?.touched ?? false;
     }
 
-    *cell_supporters(r: number, f: number): Generator<[number, number]> {
-        const cell = this._cells.getCell(r, f);
+    override *cell_supporters(r: number, f: number): Generator<[number, number]> {
+        const cell = this.cells.getCell(r, f);
         if (cell) {
             for (const id of cell.supportedby) {
-                const supportingcell = this._cells.getCellByID(id);
+                const supportingcell = this.cells.getCellByID(id);
                 if (supportingcell) {
                     yield supportingcell.position;
                 }
@@ -34,12 +34,12 @@ export class BoardPieceBridge extends IBoardPieceBridge {
         }
     }
 
-    piece(r: number, f: number): Piece {
-        return this._cells.getCell(r, f)?.piece ?? null;
+    override piece(r: number, f: number): Piece {
+        return this.cells.getCell(r, f)?.piece ?? null;
     }
 
-    move_remove(position: [number, number]): Move {
-        const cell = this._cells.getCell(...position);
+    override move_remove(position: [number, number]): Move {
+        const cell = this.cells.getCell(...position);
 
         const prevstate = {
             cell: cell,
@@ -69,9 +69,9 @@ export class BoardPieceBridge extends IBoardPieceBridge {
         });
     }
 
-    move_take(from: [number, number], to: [number, number]): Move {
-        const fromCell = this._cells.getCell(...from);
-        const toCell = this._cells.getCell(...to);
+    override move_take(from: [number, number], to: [number, number]): Move {
+        const fromCell = this.cells.getCell(...from);
+        const toCell = this.cells.getCell(...to);
 
         const prevstate = {
             to: toCell,
@@ -111,12 +111,12 @@ export class BoardPieceBridge extends IBoardPieceBridge {
         });
     }
 
-    move_mark(
+    override move_mark(
         position: [number, number],
         marks: Record<string, unknown>,
         autorevert: boolean
     ): Move {
-        const cell = this._cells.getCell(...position);
+        const cell = this.cells.getCell(...position);
         const currentmarks = { ...cell.marks };
         const nextmarks = { ...marks };
 

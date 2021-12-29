@@ -1,8 +1,14 @@
-<div class="root">
-    <div>
-        <slot />
+<script lang="ts">
+    import Comm from '$lib/components/Comm.svelte';
+</script>
+
+<Comm>
+    <div class="root">
+        <div>
+            <slot />
+        </div>
     </div>
-</div>
+</Comm>
 
 <style>
     .root > div {

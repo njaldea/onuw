@@ -1,22 +1,6 @@
-<script lang="ts">
-    import { goto } from '$app/navigation';
-    let name = '';
-
-    function next() {
-        if (name) {
-            goto(`/chat/${name}`);
-        }
-    }
-</script>
-
-<input type="text" bind:value={name} />
-<button on:click={next}>Next</button>
-
-<style>
-    input {
-        width: 100%;
-    }
-    button {
-        width: 100%;
-    }
-</style>
+<nav>
+    <a href="/chat">Chat</a>
+    <a href="/chess/both">Chess</a>
+    <a href="/chess/white">Chess - White</a>
+    <a href="/chess/black">Chess - Black</a>
+</nav>

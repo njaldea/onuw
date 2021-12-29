@@ -3,19 +3,23 @@ import type { IMove } from '$lib/game/IMove';
 import { GamePiece, Piece } from '$lib/game/Piece';
 
 export default class Knight extends GamePiece {
-    constructor(team: boolean, bridge: IBoardPieceBridge) {
+    public constructor(team: boolean, bridge: IBoardPieceBridge) {
         super('N', team, bridge);
     }
 
-    *getAttackingMoves(r: number, f: number): Generator<[number, number]> {
+    override *getAttackingMoves(r: number, f: number): Generator<[number, number]> {
         yield* this.movesCollect(r, f, (piece: Piece) => piece.team !== this.team);
     }
 
-    *getSupportingMoves(r: number, f: number): Generator<[number, number]> {
+    override *getSupportingMoves(r: number, f: number): Generator<[number, number]> {
         yield* this.movesCollect(r, f, (piece: Piece) => piece.team === this.team);
     }
 
-    *movesCollect(
+    override move(from: [number, number], to: [number, number]): IMove {
+        return this.bridge.move_take(from, to);
+    }
+
+    private *movesCollect(
         r: number,
         f: number,
         predicate: (piece: Piece) => boolean
@@ -36,9 +40,5 @@ export default class Knight extends GamePiece {
                 }
             }
         }
-    }
-
-    move(from: [number, number], to: [number, number]): IMove {
-        return this.bridge.move_take(from, to);
     }
 }
