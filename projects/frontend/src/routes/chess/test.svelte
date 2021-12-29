@@ -4,14 +4,12 @@
     import { getContext, onMount } from 'svelte';
     import type { Tooltip } from '$lib/game/Tooltip';
 
-    let tooltip: Tooltip = null;
-
-    onMount(() => (tooltip = getContext<Tooltip>('tooltip')));
+    const tooltip = getContext<Tooltip>('tooltip');
 
     const engine = new EditorEngine();
 
     let debug = false;
-    $: tooltip && debug ? tooltip.enable() : tooltip.disable();
+    $: debug ? tooltip.enable() : tooltip.disable();
 
     function keydown(ev: KeyboardEvent) {
         if (ev.key === 'd') {
