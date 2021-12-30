@@ -44,8 +44,7 @@ export default [
             },
             {
                 file: 'dist/cjs/index.cjs',
-                format: 'cjs',
-                exports: 'auto'
+                format: 'cjs'
             },
             {
                 file: 'dist/esm/index.mjs',
