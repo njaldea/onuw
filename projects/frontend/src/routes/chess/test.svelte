@@ -1,7 +1,7 @@
 <script lang="ts">
     import EditorBoard from '$lib/components/chess/EditorBoard.svelte';
     import { EditorEngine } from '$lib/chess/EditorEngine';
-    import { getContext, onMount } from 'svelte';
+    import { getContext } from 'svelte';
     import type { Tooltip } from '$lib/game/Tooltip';
 
     const tooltip = getContext<Tooltip>('tooltip');

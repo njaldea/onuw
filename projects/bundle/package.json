@@ -5,14 +5,15 @@
     "main": "package/index.js",
     "scripts": {
         "build": "rollup -c",
-        "publish": "cd dist && npm publish --access=public"
+        "clean": "rm -rf out/dist",
+        "publish": "cd out && npm publish --access=public"
     },
     "author": "",
     "license": "ISC",
     "devDependencies": {
         "@rollup/plugin-node-resolve": "^13.1.1",
-        "rollup": "^2.61.1",
-        "rollup-plugin-dts": "^4.0.1",
+        "rollup": "^2.62.0",
+        "rollup-plugin-dts": "^4.1.0",
         "rollup-plugin-svelte": "^7.1.0",
         "rollup-plugin-terser": "^7.0.2",
         "svelte": "^3.44.3"
