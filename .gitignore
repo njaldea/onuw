@@ -5,4 +5,4 @@ projects/bundle/out/dist
 
 projects/frontend/build
 projects/frontend/.svelte-kit
-projects/frontend/.vercel_build_output
+projects/frontend/.output

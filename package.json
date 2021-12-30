@@ -16,8 +16,7 @@
         "vercel:build": "npm run frontend:build",
         "npm:publish": "run-s frontend:package bundle:clean bundle:build bundle:publish",
         "heroku:publish": "git subtree push --prefix projects/chatters https://git.heroku.com/onuw-chatter.git master",
-        "format": "prettier --ignore-path .gitignore --write --plugin-search-dir=. .",
-        "build": "npm run vercel:build"
+        "format": "prettier --ignore-path .gitignore --write --plugin-search-dir=. ."
     },
     "repository": {
         "type": "git",
