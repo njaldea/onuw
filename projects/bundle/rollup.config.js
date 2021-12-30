@@ -38,23 +38,28 @@ export default [
         input,
         output: [
             {
-                file: 'out/iife.js',
+                file: 'dist/iife/index.js',
                 format: 'iife',
-                name: 'Chess'
+                name: 'njaldea_demo'
             },
             {
-                file: 'out/es.js',
+                file: 'dist/cjs/index.cjs',
+                format: 'cjs',
+                exports: 'auto'
+            },
+            {
+                file: 'dist/esm/index.mjs',
                 format: 'es'
             }
         ],
         onwarn,
-        plugins: [...plugins, terser()]
+        plugins: [...plugins]
     },
     {
         input,
         output: [
             {
-                file: 'out/es.d.ts',
+                file: 'dist/types/index.d.ts',
                 format: 'es'
             }
         ],

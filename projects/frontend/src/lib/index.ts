@@ -19,7 +19,7 @@ class Impl {
     }
 }
 
-class ChessComponent {
+export class ChessComponent {
     private impl: Impl;
     public constructor(target: HTMLDivElement, props: { flipped?: boolean }) {
         this.impl = new Impl(target, props);
@@ -30,4 +30,4 @@ class ChessComponent {
     }
 }
 
-export default ChessComponent;
+export default { ChessComponent };
