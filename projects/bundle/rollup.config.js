@@ -40,7 +40,7 @@ export default [
             {
                 file: 'dist/iife/index.js',
                 format: 'iife',
-                name: 'njaldea_demo'
+                name: 'freki.demo'
             },
             {
                 file: 'dist/cjs/index.cjs',

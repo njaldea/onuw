@@ -9,9 +9,9 @@
         <div id="chess"></div>
         <button onclick="clicked(event)">Flip</button>
         <script src="dist/iife/index.js"></script>
-        <!-- <script src="https://unpkg.com/@njaldea/demo/iife/index.js"></script> -->
+        <!-- <script src="https://unpkg.com/@freki/demo/iife/index.js"></script> -->
         <script>
-            const chess = new njaldea_demo.Chess(document.getElementById("chess"), { flipped: false });
+            const chess = new freki.demo.Chess(document.getElementById("chess"), { flipped: false });
 
             function clicked(ev) {
                 chess.flip();
