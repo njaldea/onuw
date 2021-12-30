@@ -1,12 +1,12 @@
 {
     "name": "@freki/demo",
-    "version": "0.0.1",
+    "version": "0.1.1",
     "description": "Test Package",
     "author": "Neil Jayson Aldea",
     "license": "UNLICENSED",
     "exports": {
-        "import": "./esm/index.mjs",
-        "require": "./cjs/index.cjs"
+        "import": "./dist/esm/index.mjs",
+        "require": "./dist/cjs/index.cjs"
     },
-    "types": "types/index.d.ts"
+    "types": "dist/types/index.d.ts"
 }

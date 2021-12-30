@@ -1,31 +1,28 @@
 import Module from '$lib/components/Module.svelte';
 
-// this is to hide internal type to consumers.
-class Impl {
+type Impl = {
     flipped: boolean;
     component: Module;
-
-    public constructor(target: HTMLDivElement, props: { flipped?: boolean }) {
-        this.flipped = props?.flipped || false;
-        this.component = new Module({
-            target: target,
-            props: { flipped: this.flipped }
-        });
-    }
-
-    public flip() {
-        this.flipped = !this.flipped;
-        this.component.$set({ flipped: this.flipped });
-    }
-}
+};
 
 export class Chess {
+    /** @internal **/
     private impl: Impl;
-    public constructor(target: HTMLDivElement, props: { flipped?: boolean }) {
-        this.impl = new Impl(target, props);
+
+    public constructor(target: HTMLDivElement, props: { flipped?: boolean } = {}) {
+        const flipped = props?.flipped || false;
+        this.impl = {
+            flipped,
+            component: new Module({
+                target: target,
+                props: { flipped }
+            })
+        };
     }
 
     public flip() {
-        this.impl.flip();
+        const flipped = !this.impl.flipped;
+        this.impl.flipped = flipped;
+        this.impl.component.$set({ flipped });
     }
 }

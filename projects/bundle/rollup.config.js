@@ -38,16 +38,16 @@ export default [
         input,
         output: [
             {
-                file: 'dist/iife/index.js',
+                file: 'out/dist/iife/index.js',
                 format: 'iife',
                 name: 'freki.demo'
             },
             {
-                file: 'dist/cjs/index.cjs',
+                file: 'out/dist/cjs/index.cjs',
                 format: 'cjs'
             },
             {
-                file: 'dist/esm/index.mjs',
+                file: 'out/dist/esm/index.mjs',
                 format: 'es'
             }
         ],
@@ -58,7 +58,7 @@ export default [
         input,
         output: [
             {
-                file: 'dist/types/index.d.ts',
+                file: 'out/dist/types/index.d.ts',
                 format: 'es'
             }
         ],

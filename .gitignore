@@ -1,8 +1,7 @@
 node_modules
 
 projects/bundle/package
-projects/bundle/out
-!projects/bundle/out/index.html
+projects/bundle/out/dist
 
 projects/frontend/build
 projects/frontend/.svelte-kit

@@ -5,7 +5,8 @@
     "main": "package/index.js",
     "scripts": {
         "build": "rollup -c",
-        "publish": "cd dist && npm publish --access=public"
+        "clean": "rm -rf out/dist",
+        "publish": "cd out && npm publish --access=public"
     },
     "author": "",
     "license": "ISC",
