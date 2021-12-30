@@ -9,6 +9,7 @@
         "frontend:dev": "npm run dev -w projects/frontend",
         "chatter:dev": "npm run dev -w projects/chatters",
         "bundle:build": "npm run frontend:package && npm run build -w projects/bundle",
+        "bundle:publish": "npm run bundle:build && npm run publish -w projects/bundle",
         "dev": "run-p frontend:dev chatter:dev",
         "build": "npm run frontend:build",
         "lint": "eslint --ignore-path .gitignore .",
