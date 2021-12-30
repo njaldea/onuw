@@ -1,15 +1,9 @@
 {
     "name": "@njaldea/demo",
-    "version": "0.0.7",
+    "version": "0.0.8",
     "description": "Test Package",
     "author": "Neil Jayson Aldea",
     "license": "UNLICENSED",
-    "files": [
-        "esm",
-        "iife",
-        "cjs",
-        "types"
-    ],
     "exports": {
         "import": "./esm/index.mjs",
         "require": "./cjs/index.cjs"

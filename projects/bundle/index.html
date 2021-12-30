@@ -8,10 +8,10 @@
     <body style="width: 100%; height: 100%; background-color: black;">
         <div id="chess"></div>
         <button onclick="clicked(event)">Flip</button>
-        <!-- <script src="iife.js"></script> -->
-        <script src="https://unpkg.com/@njaldea/demo@0.0.5/iife/index.js"></script>
+        <script src="dist/iife/index.js"></script>
+        <!-- <script src="https://unpkg.com/@njaldea/demo/iife/index.js"></script> -->
         <script>
-            const chess = new njaldea_demo.ChessComponent(document.getElementById("chess"), { flipped: false });
+            const chess = new njaldea_demo.Chess(document.getElementById("chess"), { flipped: false });
 
             function clicked(ev) {
                 chess.flip();
