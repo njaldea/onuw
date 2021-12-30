@@ -6,3 +6,8 @@ projects/bundle/out/dist
 projects/frontend/build
 projects/frontend/.svelte-kit
 projects/frontend/.output
+
+# sveltekit and adapter-vercel versions are locked
+# due to breaking change. Needs to wait for vercel to
+# support breaking changes before using edge
+projects/frontend/.vercel_build_output
