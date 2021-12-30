@@ -4,7 +4,8 @@
     "description": "",
     "main": "package/index.js",
     "scripts": {
-        "build": "rollup -c"
+        "build": "rollup -c",
+        "publish": "cd dist && npm publish --access=public"
     },
     "author": "",
     "license": "ISC",

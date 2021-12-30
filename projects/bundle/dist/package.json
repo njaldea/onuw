@@ -1,8 +1,9 @@
 {
     "name": "@njaldea/demo",
-    "version": "0.0.5",
+    "version": "0.0.7",
     "description": "Test Package",
     "author": "Neil Jayson Aldea",
+    "license": "UNLICENSED",
     "files": [
         "esm",
         "iife",
