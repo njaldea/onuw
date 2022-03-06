@@ -5,8 +5,10 @@
     "author": "Neil Jayson Aldea",
     "license": "UNLICENSED",
     "exports": {
-        "import": "./dist/esm/index.mjs",
-        "require": "./dist/cjs/index.cjs"
+        "browser": {
+            "import": "./dist/esm/index.mjs",
+            "require": "./dist/cjs/index.cjs"
+        }
     },
     "types": "dist/types/index.d.ts"
 }
