@@ -7,8 +7,6 @@ const config = {
 
     kit: {
         adapter: adapter(),
-        // hydrate the <div id="svelte"> element in src/app.html
-        target: '#svelte',
         vite: {
             resolve: {
                 alias: {}
@@ -18,6 +16,9 @@ const config = {
         package: {
             dir: '../bundle/package',
             exports: (filename) => filename === 'index.ts'
+        },
+        prerender: {
+            default: true
         }
     }
 };
