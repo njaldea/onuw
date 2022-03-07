@@ -44,7 +44,7 @@
             ...fill(6),
             { class: 'logspan', content: '' },
             ...fill(2),
-            { class: 'limit', content: 'timemax' }
+            { class: 'limit', content: 'time\nmax' }
         ],
         [
             { class: 'default', content: 'CH.A' },
@@ -134,6 +134,10 @@
     }
     $: msgA = onselect(4, selected);
     $: msgB = onselect(5, selected);
+
+    function click(row, index) {
+        selected = index - 1;
+    }
 </script>
 
 <div class="center" style="--row-count: 4; --column-count: 15;">
@@ -144,6 +148,7 @@
                     class:msg={i !== 0 && r >= 4 && i - 1 === (r === 4 ? msgA : msgB)}
                     class:selected={i === selected + 1 && i !== 0}
                     class={`box ${v?.class ?? 'default'}`}
+                    on:click={() => click(r, i)}
                 >
                     {v?.content ?? ''}
                 </div>
@@ -179,6 +184,7 @@
         align-items: center;
         justify-content: center;
         background-color: gray;
+        user-select: none;
     }
 
     .wrap,
