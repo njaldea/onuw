@@ -117,6 +117,31 @@
         selected = current;
     }
 
+    function prevX(row) {
+        let current = selected;
+        while (current > 0) {
+            current -= 1;
+            const { class: cl, content } = data[row][current + 1] ?? {};
+            if (['occupied', 'logspan'].includes(cl) && content != null) {
+                selected = current;
+                return;
+            }
+        }
+        selected = current;
+    }
+
+    function nextX(row) {
+        let current = selected;
+        while (current < 13) {
+            current += 1;
+            const { class: cl, content } = data[row][current + 1] ?? {};
+            if (['occupied', 'logspan'].includes(cl) && content != null) {
+                selected = current;
+                return;
+            }
+        }
+        selected = current;
+    }
     let inputvalue = -2;
     $: inputvalue = selected;
 
@@ -134,10 +159,6 @@
     }
     $: msgA = onselect(4, selected);
     $: msgB = onselect(5, selected);
-
-    function click(row, index) {
-        selected = index - 1;
-    }
 </script>
 
 <div class="center" style="--row-count: 4; --column-count: 15;">
@@ -148,7 +169,7 @@
                     class:msg={i !== 0 && r >= 4 && i - 1 === (r === 4 ? msgA : msgB)}
                     class:selected={i === selected + 1 && i !== 0}
                     class={`box ${v?.class ?? 'default'}`}
-                    on:click={() => click(r, i)}
+                    on:click={() => (selected = i - 1)}
                 >
                     {v?.content ?? ''}
                 </div>
@@ -156,12 +177,24 @@
         {/each}
     </div>
     <div class="controls">
-        <button on:click={begin}> begin </button>
-        <button on:click={prev} disabled={selected === -1}> &lt; </button>
-        <button on:click={next} disabled={selected === -1}> &gt; </button>
-        <button on:click={end}> end </button>
-        <input type="number" bind:value={inputvalue} />
-        <button on:click={() => (selected = inputvalue)}> at </button>
+        <button style:grid-area="bb" on:click={begin}> begin </button>
+        <button style:grid-area="pp" on:click={prev} disabled={selected === -1}> &lt </button>
+        <button style:grid-area="nn" on:click={next} disabled={selected === -1}> &gt </button>
+        <button style:grid-area="ee" on:click={end}> end </button>
+        <button style:grid-area="pa" on:click={() => prevX(4)} disabled={selected === -1}>
+            [A] &lt
+        </button>
+        <button style:grid-area="na" on:click={() => nextX(4)} disabled={selected === -1}>
+            &gt [A]
+        </button>
+        <button style:grid-area="pb" on:click={() => prevX(5)} disabled={selected === -1}>
+            [B] &lt
+        </button>
+        <button style:grid-area="nb" on:click={() => nextX(5)} disabled={selected === -1}>
+            &gt [B]
+        </button>
+        <input style:grid-area="ii" bind:value={inputvalue} type="number" min="0" max="13" />
+        <button style:grid-area="at" on:click={() => (selected = inputvalue)}> at </button>
     </div>
 </div>
 
@@ -178,22 +211,18 @@
     .center {
         width: 100%;
         padding-top: 100px;
-        gap: 5px;
-        padding-bottom: 20px;
+        padding-bottom: 100px;
         display: grid;
         align-items: center;
         justify-content: center;
         background-color: gray;
         user-select: none;
+        gap: 5px;
     }
 
     .wrap,
     .line {
         gap: 4px;
-    }
-
-    .center.wrap.msg {
-        font-weight: bolder;
     }
 
     .wrap {
@@ -232,22 +261,31 @@
     }
 
     .controls > input {
-        grid-column: 1 / 4;
         text-align: right;
     }
 
     .controls {
         display: grid;
-        grid-template-rows: repeat(2, 1fr);
-        grid-template-columns: repeat(4, 1fr);
-        width: 200px;
+        grid-template-rows: repeat(var(--row-count), 1fr);
+        grid-template-columns: repeat(var(--column-count), 1fr);
+        height: 100px;
+        width: 100%;
+
+        grid-template-areas:
+            'bb pp nn ee'
+            'pa pa na na'
+            'pb pb nb nb'
+            'ii ii ii at';
     }
 
     .selected {
         outline: solid red 4px;
     }
+
     .msg {
-        outline: dotted white 4px;
+        font-weight: bolder !important;
+        outline: dotted white 4px !important;
         background-color: slateblue !important;
+        color: white !important;
     }
 </style>
