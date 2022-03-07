@@ -3,18 +3,18 @@ import adapter from '@sveltejs/adapter-auto';
 import adapternode from '@sveltejs/adapter-node';
 
 const adapt = async (builder) => {
-    builder.log.success("falling back to adapter-node");
+    builder.log.success('falling back to adapter-node');
     return adapternode().adapt(builder);
-}
+};
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
     preprocess: preprocess(),
     kit: {
         adapter: {
-            name: "onuw-adapter",
+            name: 'onuw-adapter',
             adapt: async (builder) => {
-                return await adapter().adapt(builder) ?? await adapt(builder);
+                return (await adapter().adapt(builder)) ?? (await adapt(builder));
             }
         },
         vite: {
@@ -31,19 +31,22 @@ const config = {
             default: true
         },
         routes: (filepath) => {
-            const valid = !/(?:(?:^_|\/_)|(?:^\.|\/\.)(?!well-known))/.test(filepath);
-            if (valid) {
-                const subs = filepath.split('/').slice(2);
-                if (!subs.includes('index.svelte')) {
-                    const p = subs.join('/');
-                    if (p.includes('.svelte')) {
-                        console.log("  -", 'http://localhost:3000/' + p.substring(0, p.length - 7));
+            if (!/(?:(?:^_|\/_)|(?:^\.|\/\.)(?!well-known))/.test(filepath)) {
+                if (filepath.endsWith('.svelte')) {
+                    filepath = filepath.slice('src/routes/'.length);
+                    if (filepath.endsWith('index.svelte')) {
+                        console.log(
+                            '  - http://localhost:3000/' + filepath.slice(0, -'index.svelte'.length)
+                        );
                     } else {
-                        console.log("  -", 'http://localhost:3000/' + p);
+                        console.log(
+                            '  - http://localhost:3000/' + filepath.slice(0, -'.svelte'.length)
+                        );
                     }
                 }
+                return true;
             }
-            return valid;
+            return false;
         }
     }
 };
