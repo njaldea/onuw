@@ -27,9 +27,7 @@
             [
                 { class: 'default', content: 'TS' },
                 { class: 'default', content: '-\u221e' },
-                ...fill(12, (i) => {
-                    return { class: 'default', content: `${201 + i}` };
-                }),
+                ...fill(12, (i) => ({ class: 'default', content: `${201 + i}` })),
                 { class: 'default', content: '+\u221e' }
             ],
             [
@@ -48,9 +46,9 @@
                 ...fill(2),
                 { class: 'logspan', content: 'begin()' },
                 ...fill(6),
-                { class: 'logspan', content: 'end()' },
+                { class: 'logspan' },
                 ...fill(2),
-                { class: 'limit' }
+                { class: 'limit', content: 'end()' }
             ],
             [
                 { class: 'default', content: 'LogView\nIterator' },
