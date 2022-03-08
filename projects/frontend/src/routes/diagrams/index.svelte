@@ -30,7 +30,7 @@
                 ...fill(12, (i) => {
                     return { class: 'default', content: `${201 + i}` };
                 }),
-                { class: 'default', content: '\u221e' }
+                { class: 'default', content: '+\u221e' }
             ],
             [
                 { class: 'default', content: 'Log' },
@@ -152,9 +152,9 @@
     let inputvalue = 200;
     $: inputvalue = selected + 200;
 
-    function onselect(pos: number, index: number) {
+    function onselect(d: Data[], index: number) {
         while (index > 0) {
-            const { class: cl, content } = data[pos][index + 1] ?? {};
+            const { class: cl, content } = d[index + 1] ?? {};
             if (cl === 'occupied' || cl === 'logspan') {
                 if (content != null && content.length > 0) {
                     return index;
@@ -164,10 +164,10 @@
         }
         return -1;
     }
-    $: msgA = onselect(4, selected);
-    $: msgB = onselect(5, selected);
-    $: msgC = onselect(6, selected);
-    $: msgD = onselect(7, selected);
+    $: msgA = onselect(data[4], selected);
+    $: msgB = onselect(data[5], selected);
+    $: msgC = onselect(data[6], selected);
+    $: msgD = onselect(data[7], selected);
 
     $: disabled = selected === -1;
 </script>
