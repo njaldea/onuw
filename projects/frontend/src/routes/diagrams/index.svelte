@@ -8,20 +8,6 @@
         for (let i = 0; i < count; ++i) yield cb && cb(i);
     }
 
-    function createRandomData(tag: string): Data[] {
-        const random = () => Math.floor(Math.random() * 2) === 1;
-        return [
-            { class: 'default', content: `CH.${tag}` },
-            { class: 'limit', content: 'time\nmin' },
-            ...fill(2),
-            { class: 'logspan', content: random() ? tag : null },
-            ...fill(6, (i) => (random() ? { class: 'occupied', content: tag } : null)),
-            { class: 'logspan', content: random() ? tag : null },
-            ...fill(2),
-            { class: 'limit', content: 'time\nmax' }
-        ];
-    }
-
     function populateData() {
         return [
             [
@@ -87,9 +73,7 @@
                 { class: 'logspan', content: 'B' },
                 ...fill(2),
                 { class: 'limit', content: 'time\nmax' }
-            ],
-            createRandomData('C'),
-            createRandomData('D')
+            ]
         ];
     }
 
@@ -185,7 +169,7 @@
             {/each}
         {/each}
     </div>
-    <div class="controls" style={`--row-count: 7`}>
+    <div class="controls" style={`--row-count: 5`}>
         <button style:grid-area="bb" on:click={() => (selected = 3)}> begin </button>
         <button style:grid-area="ee" on:click={() => (selected = 13)}> end </button>
         <button style:grid-area="pp" on:click={() => prev()} {disabled}> &lt </button>
@@ -194,10 +178,6 @@
         <button style:grid-area="na" on:click={() => nextX(4)} {disabled}> &gt [A] </button>
         <button style:grid-area="pb" on:click={() => prevX(5)} {disabled}> [B] &lt </button>
         <button style:grid-area="nb" on:click={() => nextX(5)} {disabled}> &gt [B] </button>
-        <button style:grid-area="pc" on:click={() => prevX(6)} {disabled}> [C] &lt </button>
-        <button style:grid-area="nc" on:click={() => nextX(6)} {disabled}> &gt [C] </button>
-        <button style:grid-area="pd" on:click={() => prevX(7)} {disabled}> [D] &lt </button>
-        <button style:grid-area="nd" on:click={() => nextX(7)} {disabled}> &gt [D] </button>
         <button
             style:grid-area="at"
             on:click={() => (selected = Math.max(Math.min(inputvalue - 199, 13), 0))}
@@ -287,8 +267,6 @@
             'bb pp nn ee'
             'pa pa na na'
             'pb pb nb nb'
-            'pc pc nc nc'
-            'pd pd nd nd'
             'ii ii ii at'
             're re re re';
     }
