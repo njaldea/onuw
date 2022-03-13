@@ -17,22 +17,30 @@
             scene
         );
         camera.setTarget(BABYLON.Vector3.Zero());
-        camera.attachControl(canvas, true);
+        camera.attachControl(canvas, true, true);
 
         const light = new BABYLON.HemisphericLight('light', new BABYLON.Vector3(0, 1, -15), scene);
         light.intensity = 0.7;
 
         const material = new BABYLON.StandardMaterial('material', scene);
         material.emissiveColor = new BABYLON.Color3(0.3, 0.3, 0.3);
+        material.alpha = 0.4;
 
-        const cube = BABYLON.MeshBuilder.CreateBox(
-            'cube',
-            { height: 5, width: 5, depth: 5 },
-            scene
-        );
-        cube.material = material;
+        function createBox(x: number, y: number) {
+            const box = BABYLON.MeshBuilder.CreateBox(
+                'cube',
+                { height: 5, width: 5, depth: 5 },
+                scene
+            );
+            box.material = material;
+            box.position = new BABYLON.Vector3(x, y, 0);
+            return box;
+        }
+        const box1 = createBox(1, 1);
+        const box2 = createBox(2, 2);
 
         engine.runRenderLoop(() => {
+            box1.position.x += 0.01;
             scene.render();
         });
 
