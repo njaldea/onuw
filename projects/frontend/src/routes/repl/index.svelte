@@ -1,56 +1,40 @@
 <script lang="ts">
-    import { onDestroy, onMount } from 'svelte';
-    import type { Component } from './_types';
+    import { onMount } from 'svelte';
+    import { request } from './_module_worker';
 
-    // vite will handle this
-    // TODO: find a way to use typescript for the worker script
+    import { writable } from 'svelte/store';
 
-    import Worker from './_worker.ts?worker';
+    let doc: string;
 
-    let worker: Worker;
+    let component;
+    let div: HTMLDivElement;
 
-    let components: Component[] = [
-        {
-            id: 0,
-            name: 'App',
-            type: 'svelte',
-            source: `<script>import Component from './Component1.svelte';<\/script><Component />`
-        },
-        {
-            id: 1,
-            name: 'Component1',
-            type: 'svelte',
-            source: '<h1>Hello</h1>'
-        }
-    ];
+    let props = {
+        text: writable('Hello World')
+    };
 
-    let registeredHandle: (event: MessageEvent<any>) => void;
+    props.text.subscribe((v) => console.log(`prop is being updated ${v}`));
 
-    function handle(event: MessageEvent<any>) {
-        console.log(event.data);
-    }
-
-    function waitReady(event: MessageEvent<string>) {
-        if (event.data === 'ready') {
-            worker.removeEventListener('message', waitReady);
-            worker.addEventListener('message', handle);
-            registeredHandle = handle;
-            worker.postMessage(components);
-        }
-    }
-
-    onMount(async () => {
-        worker = await new Worker();
-        worker.addEventListener('message', waitReady);
-        registeredHandle = waitReady;
-    });
-
-    onDestroy(async () => {
-        if (worker) {
-            if (registeredHandle) {
-                worker.removeEventListener('message', registeredHandle);
+    async function process(d: string) {
+        if (d) {
+            const blob = new Blob([d], { type: 'text/javascript' });
+            const url = URL.createObjectURL(blob);
+            const { default: Component } = await import(url);
+            if (component) {
+                component.$destroy();
             }
-            worker.terminate();
+            component = new Component({ target: div, props });
+        } else {
+            if (component) {
+                component.$destroy();
+            }
+            component = null;
         }
-    });
+    }
+
+    $: process(doc);
+
+    onMount(async () => (doc = await request()));
 </script>
+
+<div bind:this={div} />
