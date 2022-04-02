@@ -1,40 +1,25 @@
 <script lang="ts">
-    import { onMount } from 'svelte';
+    import { onMount, SvelteComponent } from 'svelte';
+    import RuntimeCompiled from './_RuntimeCompiled.svelte';
     import { request } from './_module_worker';
 
-    import { writable } from 'svelte/store';
+    let components: Record<string, typeof SvelteComponent> = {};
 
-    let doc: string;
+    onMount(async () => {
+        const doc = await request();
 
-    let component;
-    let div: HTMLDivElement;
-
-    let props = {
-        text: writable('Hello World')
-    };
-
-    props.text.subscribe((v) => console.log(`prop is being updated ${v}`));
-
-    async function process(d: string) {
-        if (d) {
-            const blob = new Blob([d], { type: 'text/javascript' });
+        if (doc) {
+            const blob = new Blob([doc], { type: 'text/javascript' });
             const url = URL.createObjectURL(blob);
-            const { default: Component } = await import(url);
-            if (component) {
-                component.$destroy();
-            }
-            component = new Component({ target: div, props });
-        } else {
-            if (component) {
-                component.$destroy();
-            }
-            component = null;
+            components = (await import(/* @vite-ignore */ url)).default;
         }
-    }
-
-    $: process(doc);
-
-    onMount(async () => (doc = await request()));
+    });
 </script>
 
-<div bind:this={div} />
+{#each Object.entries(components) as [key, ComponentType]}
+    <RuntimeCompiled
+        {ComponentType}
+        props={{ text: { value: 'Hello World' } }}
+        events={['click']}
+    />
+{/each}

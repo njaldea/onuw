@@ -17,19 +17,33 @@ function generate_lookup(): void {
     const components: Component[] = [
         {
             id: 0,
+            name: 'index',
+            type: 'js',
+            source:
+                `
+                    import App from './App.svelte';
+                    export default { App };
+                `
+        },
+        {
+            id: 0,
             name: 'App',
             type: 'svelte',
-            source: `
-<script>
-    export let text;
-</script>
-<h1>{$text}</h1>
-<input type="text" bind:value={$text}>
-<style>
-    h1 { color: white; }
-</style>`
+            source:
+                `
+                    <script>
+                        export let text;
+                    </script>
+                    <h1>{$text}</h1>
+                    <input type="text" bind:value={$text}>
+                    <button on:click>ClickMe</button>
+                    <style>
+                        h1 { color: white; }
+                    </style>
+                `
         }
     ];
+
     components.forEach((component) => {
         component_lookup.set(`./${component.name}.${component.type}`, component);
     });
@@ -39,7 +53,7 @@ self.addEventListener('message', async (event: MessageEvent<Component[]>): Promi
     generate_lookup();
 
     const bundle = await rollup.rollup({
-        input: './App.svelte',
+        input: './index.js',
         plugins: [
             {
                 name: 'repl-plugin',
