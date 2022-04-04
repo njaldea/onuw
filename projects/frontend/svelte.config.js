@@ -2,8 +2,6 @@ import preprocess from 'svelte-preprocess';
 import adapter from '@sveltejs/adapter-auto';
 import adapternode from '@sveltejs/adapter-node';
 
-import typescript from 'typescript';
-
 const adapt = async (builder) => {
     builder.log.success('falling back to adapter-node');
     return adapternode().adapt(builder);
@@ -21,14 +19,11 @@ const config = {
         },
         vite: {
             resolve: {
-                alias: {}
+                alias: {
+                    path: 'path-browserify'
+                }
             },
             envPrefix: 'ONUW_',
-            worker: {
-                format: 'iife',
-                plugins: [],
-                rollupOptions: {}
-            }
         },
         package: {
             dir: '../bundle/package',

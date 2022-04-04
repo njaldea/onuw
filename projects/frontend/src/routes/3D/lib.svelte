@@ -1,12 +1,12 @@
 <script lang="ts">
-    import { components as FREKI } from '@freki/3d';
-    const { Canvas } = FREKI;
-    const { Camera, KeyboardControl, Target } = FREKI.camera.arcrotate;
-    const { HemisphericLight } = FREKI.lights;
-    const { Box, Ground } = FREKI.mesh;
-    const { StandardMaterial, RefMaterial } = FREKI.material;
-    const { TransformNode, MeshActionManager } = FREKI.core;
-    const { HighlightLayer } = FREKI.effects;
+    import { components as NIL } from '@nil-/3d';
+    const { Canvas } = NIL;
+    const { Camera, KeyboardControl, Target } = NIL.camera.arcrotate;
+    const { HemisphericLight } = NIL.lights;
+    const { Box, Ground } = NIL.mesh;
+    const { StandardMaterial, RefMaterial } = NIL.material;
+    const { TransformNode, MeshActionManager } = NIL.core;
+    const { HighlightLayer } = NIL.effects;
 
     let target = '';
     let intensity = 0.3;

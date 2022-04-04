@@ -1,91 +1,76 @@
-import type { Component } from './_types';
-
 import * as rollup from 'rollup/dist/es/rollup.browser.js';
+import { compile } from 'svelte/compiler';
+import path from 'path';
+
+interface Component {
+    name: string;
+    type: string;
+    source: string;
+}
 
 // you could use unpkg like the official repl, i thought i'd try out jsdelivr
 const CDN_URL = 'https://cdn.jsdelivr.net/npm';
 
-import { compile } from 'svelte/compiler';
-
-const component_lookup: Map<string, Component> = new Map();
-
-async function fetch_package(url: string): Promise<string> {
+async function fetchAsText(url: string): Promise<string> {
     return (await fetch(url)).text();
 }
 
-function generate_lookup(): void {
-    const components: Component[] = [
-        {
-            id: 0,
-            name: 'index',
-            type: 'js',
-            source:
-                `
-                    import App from './App.svelte';
-                    export default { App };
-                `
-        },
-        {
-            id: 0,
-            name: 'App',
-            type: 'svelte',
-            source:
-                `
-                    <script>
-                        export let text;
-                    </script>
-                    <h1>{$text}</h1>
-                    <input type="text" bind:value={$text}>
-                    <button on:click>ClickMe</button>
-                    <style>
-                        h1 { color: white; }
-                    </style>
-                `
-        }
-    ];
-
-    components.forEach((component) => {
-        component_lookup.set(`./${component.name}.${component.type}`, component);
-    });
+interface Detail {
+    tags: string[],
+    prefix: string,
+    assets: string
 }
 
-self.addEventListener('message', async (event: MessageEvent<Component[]>): Promise<void> => {
-    generate_lookup();
-
+self.addEventListener('message', async (event: MessageEvent<Detail>): Promise<void> => {
+    const { tags, prefix, assets } = event.data;
+    const module_cache: Map<string, string> = new Map();
+    module_cache.set('./index.js', tags.map(tag => `export { default as ${tag} } from './${tag}.svelte';`).join());
     const bundle = await rollup.rollup({
         input: './index.js',
         plugins: [
             {
                 name: 'repl-plugin',
                 async resolveId(importee: string, importer: string) {
-                    // handle imports from 'svelte'
+                    if (importee === 'svelte') {
+                        return `${CDN_URL}/svelte/index.mjs`;
+                    }
 
-                    // import x from 'svelte'
-                    if (importee === 'svelte') return `${CDN_URL}/svelte/index.mjs`;
-
-                    // import x from 'svelte/somewhere'
                     if (importee.startsWith('svelte/')) {
                         return `${CDN_URL}/svelte/${importee.slice(7)}/index.mjs`;
                     }
 
-                    // import x from './file.js' (via a 'svelte' or 'svelte/x' package)
                     if (importer && importer.startsWith(`${CDN_URL}/svelte`)) {
                         const resolved = new URL(importee, importer).href;
-                        if (resolved.endsWith('.mjs')) return resolved;
+                        if (resolved.endsWith('.mjs')) {
+                            return resolved;
+                        }
                         return `${resolved}/index.mjs`;
                     }
 
-                    // local repl components
-                    if (component_lookup.has(importee)) return importee;
+                    if (importee.startsWith('onuw/')) {
+                        return importee.replace('onuw/', `${location.origin}/assets/`);
+                    }
 
-                    // relative imports from a remote package
-                    if (importee.startsWith('.')) return new URL(importee, importer).href;
+                    if (module_cache.has(importee)) {
+                        return importee;
+                    }
+
+                    if (importee.startsWith('.')) {
+                        try {
+                            // throws is importer a relative path (runtime provided);
+                            new URL(importer);
+                            return new URL(importee, importer).href;
+                        } catch {
+                            const url = './' + path.join(path.dirname(importer), importee);
+                            module_cache.set(url, null);
+                            return url;
+                        }
+                    }
 
                     // bare named module imports (importing an npm package)
-
                     // get the package.json and load it into memory
                     const pkg_url = `${CDN_URL}/${importee}/package.json`;
-                    const pkg = JSON.parse(await fetch_package(pkg_url));
+                    const pkg = JSON.parse(await fetchAsText(pkg_url));
 
                     // get an entry point from the pkg.json - first try svelte, then modules, then main
                     if (pkg.svelte || pkg.module || pkg.main) {
@@ -98,17 +83,25 @@ self.addEventListener('message', async (event: MessageEvent<Component[]>): Promi
                     return importee;
                 },
                 async load(id: string) {
-                    // local repl components are stored in memory
-                    // this is our virtual filesystem
-                    if (component_lookup.has(id)) return component_lookup.get(id).source;
+                    if (module_cache.has(id)) {
+                        let data = module_cache.get(id);
+                        if (data == null) {
+                            data = await fetchAsText(`/repl/data?path=${id.replace(/\//g, '%2F')}`);
+                            module_cache.set(id, data);
+                        }
+                        return data;
+                    }
 
-                    // everything else comes from a cdn
-                    return await fetch_package(id);
+                    const text = await fetchAsText(id);
+                    module_cache.set(id, text);
+                    return text;
                 },
                 transform(code: string, id: string) {
                     // our only transform is to compile svelte components
                     //@ts-ignore
-                    if (/.*\.svelte/.test(id)) return compile(code).js.code;
+                    if (/.*\.svelte/.test(id)) {
+                        return compile(code).js.code;
+                    }
                 }
             }
         ]
@@ -119,4 +112,6 @@ self.addEventListener('message', async (event: MessageEvent<Component[]>): Promi
     const output: string = (await bundle.generate({ format: 'esm' })).output[0].code;
 
     self.postMessage(output);
+
+    self.close();
 });

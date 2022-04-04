@@ -5,21 +5,35 @@
 
     let components: Record<string, typeof SvelteComponent> = {};
 
+    const tags = ['App'];
+
     onMount(async () => {
-        const doc = await request();
+        const doc = await request([...new Set(tags)]);
 
         if (doc) {
             const blob = new Blob([doc], { type: 'text/javascript' });
             const url = URL.createObjectURL(blob);
-            components = (await import(/* @vite-ignore */ url)).default;
+            components = await import(/* @vite-ignore */ url);
         }
     });
 </script>
 
-{#each Object.entries(components) as [key, ComponentType]}
-    <RuntimeCompiled
-        {ComponentType}
-        props={{ text: { value: 'Hello World' } }}
-        events={['click']}
-    />
-{/each}
+<div>
+    {#each tags as tag}
+        {#if components[tag]}
+            <RuntimeCompiled
+                ComponentType={components[tag]}
+                props={{ text: { value: 'Hello World' } }}
+                events={['click']}
+            />
+        {/if}
+    {/each}
+</div>
+
+<style>
+    div {
+        width: 500px;
+        display: flex;
+        flex-direction: column;
+    }
+</style>

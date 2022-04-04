@@ -1,15 +1,14 @@
 import Worker from './_worker.ts?worker';
 
-export async function request() {
+export async function request(modules: string[]) {
     const worker = await new Worker();
 
     return new Promise<string>((resolve, reject) => {
-        function handle(event: MessageEvent<any>) {
-            worker.terminate();
-            resolve(event.data);
-        }
-
-        worker.addEventListener('message', handle);
-        worker.postMessage("request");
+        worker.addEventListener('message', (event) => resolve(event.data));
+        worker.postMessage({
+            tags: modules,
+            prefix: 'onuw/',
+            assets: 'assets/components/'
+        });
     });
 }
